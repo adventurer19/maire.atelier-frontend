@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilters from '@/components/products/ProductFilters';
 import ProductSort from '@/components/products/ProductSort';
-import { api } from '@/lib/api/client';
+import { productsApi } from '@/lib/api/products';
 
 interface ProductsPageProps {
     searchParams: {
@@ -25,12 +25,13 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     const page = Number(searchParams.page) || 1;
     const categoryId = searchParams.category ? Number(searchParams.category) : undefined;
 
-    // Fetch products from API
-    const productsData = await api.getProducts({
+    // Fetch products from API (Server Component)
+    const productsData = await productsApi.getProducts({
         page,
         per_page: 12,
         category_id: categoryId,
     });
+    console.log(productsData);
 
     return (
         <div className="min-h-screen bg-gray-50">

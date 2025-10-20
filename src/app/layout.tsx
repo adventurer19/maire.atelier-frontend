@@ -1,24 +1,24 @@
 // src/app/layout.tsx
-import type { Metadata } from 'next';
-import './globals.css';
+import type { Metadata } from "next";
+import "./globals.css";
+import { QueryProvider } from "@/providers/QueryProvider";
 
 export const metadata: Metadata = {
-    title: {
-        default: 'MAIRE ATELIER - Modern Fashion',
-        template: '%s | MAIRE ATELIER',
-    },
-    description: 'Открийте нашата колекция от уникални модни дрехи',
+    title: "maire.atelier - Fashion Brand",
+    description: "Modern fashion eCommerce platform",
 };
 
 export default function RootLayout({
                                        children,
-                                   }: {
+                                   }: Readonly<{
     children: React.ReactNode;
-}) {
+}>) {
     return (
-        <html lang="bg">
-        <body className="font-sans antialiased">
-        {children}
+        <html lang="en">
+        <body>
+        <QueryProvider>
+            {children}
+        </QueryProvider>
         </body>
         </html>
     );

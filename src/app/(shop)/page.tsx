@@ -4,7 +4,7 @@ import HeroSection from '@/components/home/HeroSection';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import CategoryGrid from '@/components/home/CategoryGrid';
 import Newsletter from '@/components/home/Newsletter';
-import { api } from '@/lib/api/client';
+import { productsApi } from '@/lib/api/products';
 
 export const metadata = {
     title: 'MAIRE ATELIER - Modern Fashion',
@@ -13,7 +13,7 @@ export const metadata = {
 
 export default async function HomePage() {
     // Fetch featured products on server
-    const featuredData = await api.getFeaturedProducts(8);
+    const featuredProducts = await productsApi.getFeatured();
 
     return (
         <div className="min-h-screen">
@@ -33,7 +33,7 @@ export default async function HomePage() {
                     </div>
 
                     <Suspense fallback={<FeaturedProductsSkeleton />}>
-                        <FeaturedProducts products={featuredData.data} />
+                        <FeaturedProducts products={featuredProducts} />
                     </Suspense>
                 </div>
             </section>
