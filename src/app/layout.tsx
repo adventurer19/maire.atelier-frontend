@@ -3,9 +3,23 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
 
+// ✅ SEO / OpenGraph / Meta настройки
 export const metadata: Metadata = {
-    title: "maire.atelier - Fashion Brand",
-    description: "Modern fashion eCommerce platform",
+    title: {
+        default: "MAIRE ATELIER – Modern Fashion",
+        template: "%s | MAIRE ATELIER",
+    },
+    description: "Модерен бранд за мода и стил – MAIRE Atelier.",
+    keywords: ["мода", "дрехи", "рокли", "аксесоари", "fashion", "онлайн магазин"],
+    metadataBase: new URL("https://maire.atelier"), // ако имаш продакшън домейн
+    openGraph: {
+        title: "MAIRE ATELIER",
+        description: "Онлайн магазин за модерна мода",
+        url: "https://maire.atelier",
+        siteName: "MAIRE ATELIER",
+        locale: "bg_BG",
+        type: "website",
+    },
 };
 
 export default function RootLayout({
@@ -14,11 +28,10 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-        <body>
-        <QueryProvider>
-            {children}
-        </QueryProvider>
+        <html lang="bg" className="scroll-smooth">
+        <body className="bg-white text-gray-900 antialiased">
+        {/* ✅ QueryProvider обгръща всичко */}
+        <QueryProvider>{children}</QueryProvider>
         </body>
         </html>
     );

@@ -1,15 +1,32 @@
-// src/components/layout/header/Header.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/ui/Logo';
 import SearchBar from './SearchBar';
 import CartButton from './CartButton';
 import { Suspense } from 'react';
+import LogoutButton from '@/components/auth/LogoutButton';
 
 export default function Header() {
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const [user, setUser] = useState<any>(null);
+    const [isPending, startTransition] = useTransition();
+
+    // ✅ Взимаме текущия потребител (чрез API proxy)
+    useEffect(() => {
+        startTransition(async () => {
+            try {
+                const res = await fetch('/api/auth/me', { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+                    setUser(data.user ?? null);
+                }
+            } catch {
+                setUser(null);
+            }
+        });
+    }, []);
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -39,7 +56,7 @@ export default function Header() {
                             <SearchIcon />
                         </button>
 
-                        {/* Wishlist - Hidden on smallest screens */}
+                        {/* Wishlist */}
                         <Link
                             href="/wishlist"
                             className="hidden sm:flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition-colors"
@@ -48,23 +65,32 @@ export default function Header() {
                             <HeartIcon />
                         </Link>
 
-                        {/* Account - Hidden on smallest screens */}
-                        <Link
-                            href="/account"
-                            className="hidden sm:flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition-colors"
-                            aria-label="Account"
-                        >
-                            <UserIcon />
-                        </Link>
+                        {/* Account / Auth */}
+                        {user ? (
+                            <>
+                <span className="hidden sm:flex text-sm text-gray-700">
+                  Hi, {user.name}
+                </span>
+                                <LogoutButton />
+                            </>
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="hidden sm:flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition-colors"
+                                aria-label="Login"
+                            >
+                                <UserIcon />
+                            </Link>
+                        )}
 
-                        {/* Cart - Always visible */}
+                        {/* Cart */}
                         <Suspense fallback={<CartButtonSkeleton />}>
                             <CartButton />
                         </Suspense>
                     </nav>
                 </div>
 
-                {/* Mobile Search Bar - Expandable */}
+                {/* Mobile Search Bar */}
                 {mobileSearchOpen && (
                     <div className="md:hidden pb-4 animate-in slide-in-from-top-2">
                         <Suspense fallback={<SearchBarSkeleton />}>
@@ -85,7 +111,6 @@ function SearchIcon() {
         </svg>
     );
 }
-
 function HeartIcon() {
     return (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,7 +118,6 @@ function HeartIcon() {
         </svg>
     );
 }
-
 function UserIcon() {
     return (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,16 +125,9 @@ function UserIcon() {
         </svg>
     );
 }
-
-// Skeleton components
 function SearchBarSkeleton() {
-    return (
-        <div className="w-full h-10 bg-gray-100 rounded-lg animate-pulse" />
-    );
+    return <div className="w-full h-10 bg-gray-100 rounded-lg animate-pulse" />;
 }
-
 function CartButtonSkeleton() {
-    return (
-        <div className="h-10 w-10 bg-gray-100 rounded-full animate-pulse" />
-    );
+    return <div className="h-10 w-10 bg-gray-100 rounded-full animate-pulse" />;
 }

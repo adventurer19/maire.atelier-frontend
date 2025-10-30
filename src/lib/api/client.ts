@@ -1,102 +1,61 @@
 // src/lib/api/client.ts
-
-import axios, { AxiosError } from 'axios';
+import axios from "axios";
 
 /**
- * Base API client configuration
- * Configured to work with Laravel Sanctum authentication
+ * Axios client configuration for Laravel API
+ * - Base URL comes from NEXT_PUBLIC_API_URL
+ * - Handles authorization headers
+ * - Provides centralized error handling
  */
 export const apiClient = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://maire.atelier.test/api',
+    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
     headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest', // Required for Laravel
+        "Content-Type": "application/json",
+        Accept: "application/json",
     },
-    withCredentials: true, // Important for Sanctum CSRF cookie
+    withCredentials: false, // Disable Sanctum cookies unless you need them
 });
 
 /**
- * Initialize CSRF token
- * Call this before first authenticated request
- */
-export const initCsrf = async () => {
-    try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://maire.atelier.test';
-        await axios.get(`${baseUrl}/sanctum/csrf-cookie`, {
-            withCredentials: true,
-        });
-    } catch (error) {
-        console.error('Failed to initialize CSRF token:', error);
-    }
-};
-
-/**
- * Request interceptor
- * Adds authentication token if available
+ * Request interceptor:
+ * - Adds Bearer token from localStorage
+ * - Adds Accept-Language header
  */
 apiClient.interceptors.request.use(
     (config) => {
-        // Get token from localStorage (set after login)
-        const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+        if (typeof window !== "undefined") {
+            const token = localStorage.getItem("auth_token");
+            if (token) config.headers.Authorization = `Bearer ${token}`;
 
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            const locale = localStorage.getItem("locale") || "bg";
+            config.headers["Accept-Language"] = locale;
         }
-
-        // Add locale header for translations
-        const locale = typeof window !== 'undefined' ? localStorage.getItem('locale') || 'en' : 'en';
-        config.headers['Accept-Language'] = locale;
-
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
 );
 
 /**
- * Response interceptor
- * Handle common errors globally
+ * Response interceptor:
+ * - Handles 401 (unauthorized) by redirecting to /login
+ * - Logs 403, 404, 422, and 500 errors for debugging
  */
 apiClient.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error: AxiosError<any>) => {
-        // Handle 401 Unauthorized
-        if (error.response?.status === 401) {
-            // Clear auth token
-            if (typeof window !== 'undefined') {
-                localStorage.removeItem('auth_token');
+    (res) => res,
+    (error) => {
+        const status = error.response?.status;
 
-                // Redirect to login if not already there
-                if (!window.location.pathname.includes('/login')) {
-                    window.location.href = '/login';
-                }
+        if (status === 401 && typeof window !== "undefined") {
+            localStorage.removeItem("auth_token");
+            if (!window.location.pathname.includes("/login")) {
+                window.location.href = "/login";
             }
         }
 
-        // Handle 403 Forbidden
-        if (error.response?.status === 403) {
-            console.error('Access denied:', error.response.data.message);
-        }
-
-        // Handle 404 Not Found
-        if (error.response?.status === 404) {
-            console.error('Resource not found:', error.response.data.message);
-        }
-
-        // Handle 422 Validation Error
-        if (error.response?.status === 422) {
-            const validationErrors = error.response.data.errors;
-            console.error('Validation errors:', validationErrors);
-        }
-
-        // Handle 500 Server Error
-        if (error.response?.status === 500) {
-            console.error('Server error:', error.response.data.message);
-        }
+        if (status === 403) console.error("🚫 Forbidden");
+        if (status === 404) console.error("❌ Resource not found");
+        if (status === 422) console.error("⚠️ Validation error", error.response.data.errors);
+        if (status === 500) console.error("💥 Server error:", error.response.data.message);
 
         return Promise.reject(error);
     }

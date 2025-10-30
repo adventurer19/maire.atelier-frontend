@@ -4,7 +4,7 @@ export const siteData = {
   about: {
     hero: {
       title: "За MAIRE ATELIER",
-      subtitle: "Модерен моден бранд с душа",
+      subtitle: "Модерен моден бранд",
       description: "Създаваме уникални модни парчета, които разказват история"
     },
     story: {

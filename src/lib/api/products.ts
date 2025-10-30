@@ -1,6 +1,5 @@
 // src/lib/api/products.ts
-
-import { apiClient } from './client';
+import { apiClient } from "./client";
 
 interface ProductsParams {
     page?: number;
@@ -10,24 +9,59 @@ interface ProductsParams {
     search?: string;
 }
 
+/**
+ * Products API module for Laravel
+ * Normalizes all responses to always return:
+ * {
+ *   data: Product[],
+ *   meta: PaginationMeta
+ * }
+ */
 export const productsApi = {
+    /**
+     * Fetch all products with pagination & filters
+     */
     getProducts: async (params?: ProductsParams) => {
-        const response = await apiClient.get('/products', { params });
-        return response.data; // Return full response with data & meta
+        const res = await apiClient.get("/products", { params });
+
+        // Laravel returns { data: [...], meta: {...} }
+        // We normalize it so the frontend always gets { data, meta }
+        const data = res.data?.data ?? [];
+        const meta = res.data?.meta ?? {};
+
+        return { data, meta };
     },
 
+    /**
+     * Fetch a single product by slug
+     */
     getProduct: async (slug: string) => {
-        const response = await apiClient.get(`/products/${slug}`);
-        return response.data.data;
+        try {
+            const res = await apiClient.get(`/products/${slug}`);
+            // Laravel returns { data: {...} }, so extract inner data
+            return res.data?.data ?? null;
+        } catch (error) {
+            console.error("❌ Error fetching product:", error);
+            return null;
+        }
     },
 
+    /**
+     * Fetch featured products
+     */
     getFeatured: async () => {
-        const response = await apiClient.get('/products/featured');
-        return response.data.data;
+        const res = await apiClient.get("/products/featured");
+        const data = res.data?.data ?? [];
+        return { data };
     },
 
+    /**
+     * Search products by query string
+     */
     search: async (query: string) => {
-        const response = await apiClient.get('/search', { params: { q: query } });
-        return response.data.data;
+        const res = await apiClient.get("/search", { params: { q: query } });
+        const data = res.data?.data ?? [];
+        const meta = res.data?.meta ?? {};
+        return { data, meta };
     },
 };

@@ -1,56 +1,58 @@
 // src/app/(shop)/products/[slug]/page.tsx
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
-import { api } from '@/lib/api/client';
-import AddToCartButton from '@/components/products/AddToCartButton';
-import ProductGallery from '@/components/products/ProductGallery';
-import ProductInfo from '@/components/products/ProductInfo';
-import RelatedProducts from '@/components/products/RelatedProducts';
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { productsApi } from "@/lib/api/products";
+import ProductGallery from "@/components/products/ProductGallery";
+import ProductInfo from "@/components/products/ProductInfo";
+import RelatedProducts from "@/components/products/RelatedProducts";
 
+/**
+ * Product page for single product view
+ * Uses SSR (async) to fetch product by slug from Laravel API
+ */
 interface ProductPageProps {
     params: {
         slug: string;
     };
 }
 
+/**
+ * Generate SEO metadata for the product page
+ */
 export async function generateMetadata({ params }: ProductPageProps) {
     try {
-        const { data: product } = await api.getProduct(params.slug);
-        const productName = typeof product.name === 'string'
-            ? product.name
-            : product.name.bg || product.name.en;
+        const product = await productsApi.getProduct(params.slug);
+
+        if (!product) {
+            return { title: "Продукт | MAIRE ATELIER" };
+        }
 
         return {
-            title: `${productName} | MAIRE ATELIER`,
-            description: typeof product.description === 'string'
-                ? product.description
-                : product.description.bg || product.description.en,
+            title: `${product.name} | MAIRE ATELIER`,
+            description: product.meta_description || product.description || "",
         };
-    } catch {
-        return {
-            title: 'Продукт | MAIRE ATELIER',
-        };
+    } catch (error) {
+        console.error("Error generating metadata:", error);
+        return { title: "Продукт | MAIRE ATELIER" };
     }
 }
 
+/**
+ * Product page component
+ */
 export default async function ProductPage({ params }: ProductPageProps) {
-    let product;
+    let product = null;
 
     try {
-        const response = await api.getProduct(params.slug);
-        product = response.data;
+        product = await productsApi.getProduct(params.slug);
     } catch (error) {
-        notFound();
+        console.error("❌ Error fetching product:", error);
     }
 
-    const productName = typeof product.name === 'string'
-        ? product.name
-        : product.name.bg || product.name.en;
-
-    const productDescription = typeof product.description === 'string'
-        ? product.description
-        : product.description.bg || product.description.en;
+    // If no product found -> show 404
+    if (!product) {
+        notFound();
+    }
 
     return (
         <div className="min-h-screen bg-white">
@@ -58,11 +60,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="border-b">
                 <div className="container py-4">
                     <nav className="flex items-center gap-2 text-sm text-gray-600">
-                        <Link href="/" className="hover:text-gray-900">Начало</Link>
+                        <Link href="/" className="hover:text-gray-900">
+                            Начало
+                        </Link>
                         <span>/</span>
-                        <Link href="/products" className="hover:text-gray-900">Продукти</Link>
+                        <Link href="/products" className="hover:text-gray-900">
+                            Продукти
+                        </Link>
                         <span>/</span>
-                        <span className="text-gray-900">{productName}</span>
+                        <span className="text-gray-900">{product.name}</span>
                     </nav>
                 </div>
             </div>
@@ -71,7 +77,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="container py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Product Gallery */}
-                    <ProductGallery images={product.images} productName={productName} />
+                    <ProductGallery
+                        images={product.images || []}
+                        productName={product.name}
+                    />
 
                     {/* Product Info */}
                     <ProductInfo product={product} />
@@ -84,55 +93,57 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                 {/* Related Products */}
                 <div className="mt-16">
-                    <RelatedProducts categoryId={product.categories[0]?.id} currentProductId={product.id} />
+                    <RelatedProducts
+                        categoryId={product.categories?.[0]?.id}
+                        currentProductId={product.id}
+                    />
                 </div>
             </div>
         </div>
     );
 }
 
+/**
+ * Product details section with additional info
+ */
 function ProductTabs({ product }: { product: any }) {
-    const description = typeof product.description === 'string'
-        ? product.description
-        : product.description.bg || product.description.en;
-
-    const material = typeof product.material === 'string'
-        ? product.material
-        : product.material?.bg || product.material?.en;
-
-    const careInstructions = typeof product.care_instructions === 'string'
-        ? product.care_instructions
-        : product.care_instructions?.bg || product.care_instructions?.en;
-
     return (
         <div className="border-t border-gray-200">
-            <div className="py-8">
-                <h2 className="text-2xl font-serif font-bold text-gray-900 mb-6">
-                    Описание на продукта
-                </h2>
-                <div className="prose prose-gray max-w-none">
-                    <p className="text-gray-600 leading-relaxed">{description}</p>
+            {/* Description */}
+            {product.description && (
+                <div className="py-8">
+                    <h2 className="text-2xl font-serif font-bold text-gray-900 mb-6">
+                        Описание на продукта
+                    </h2>
+                    <div className="prose prose-gray max-w-none">
+                        <p className="text-gray-600 leading-relaxed">
+                            {product.description}
+                        </p>
+                    </div>
                 </div>
-            </div>
+            )}
 
-            {material && (
+            {/* Material */}
+            {product.material && (
                 <div className="py-8 border-t border-gray-200">
                     <h2 className="text-2xl font-serif font-bold text-gray-900 mb-6">
                         Материал
                     </h2>
-                    <p className="text-gray-600">{material}</p>
+                    <p className="text-gray-600">{product.material}</p>
                 </div>
             )}
 
-            {careInstructions && (
+            {/* Care Instructions */}
+            {product.care_instructions && (
                 <div className="py-8 border-t border-gray-200">
                     <h2 className="text-2xl font-serif font-bold text-gray-900 mb-6">
                         Грижа за продукта
                     </h2>
-                    <p className="text-gray-600">{careInstructions}</p>
+                    <p className="text-gray-600">{product.care_instructions}</p>
                 </div>
             )}
 
+            {/* Shipping info */}
             <div className="py-8 border-t border-gray-200">
                 <h2 className="text-2xl font-serif font-bold text-gray-900 mb-6">
                     Информация за доставка
