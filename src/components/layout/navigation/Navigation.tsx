@@ -1,39 +1,59 @@
-// src/components/layout/navigation/Navigation.tsx
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import MobileMenu from './MobileMenu';
 import NavDropdown from './NavDropdown';
 import type { NavItem } from '@/types/navigation';
-
-const navItems: NavItem[] = [
-    { name: 'Начало', href: '/' },
-    {
-        name: 'Продукти',
-        href: '/products',
-        dropdown: [
-            { name: 'Всички продукти', href: '/products' },
-            { name: 'Нови постъпления', href: '/products?sort=new' },
-            { name: 'Намаления', href: '/products?sale=true' },
-            { name: 'Бестселъри', href: '/products?featured=true' },
-        ]
-    },
-    {
-        name: 'Категории',
-        href: '/categories',
-        dropdown: [
-            { name: 'Рокли', href: '/products?category=dresses' },
-            { name: 'Блузи', href: '/products?category=tops' },
-            { name: 'Панталони', href: '/products?category=pants' },
-            { name: 'Пола', href: '/products?category=skirts' },
-            { name: 'Якета', href: '/products?category=jackets' },
-            { name: 'Аксесоари', href: '/products?category=accessories' },
-        ]
-    },
-    { name: 'Колекции', href: '/collections' },
-    { name: 'За нас', href: '/about' },
-    { name: 'Контакти', href: '/contact' },
-];
+import { categoriesApi } from '@/lib/api/categories';
 
 export default function Navigation() {
+    const [categories, setCategories] = useState<NavItem['dropdown']>([]);
+
+    // Зареждаме категориите от бекенда
+    useEffect(() => {
+        async function loadCategories() {
+            try {
+                const cats = await categoriesApi.getMenuCategories();
+                const formatted = cats.map((cat) => ({
+                    name:
+                        typeof cat.name === 'string'
+                            ? cat.name
+                            : cat.name?.bg || cat.name?.en || 'Категория',
+                    href: `/products?category=${cat.slug}`,
+                }));
+                setCategories(formatted);
+            } catch (error) {
+                console.error('❌ Error loading menu categories:', error);
+            }
+        }
+
+        loadCategories();
+    }, []);
+
+    // Статични нав елементи
+    const navItems: NavItem[] = [
+        { name: 'Начало', href: '/' },
+        {
+            name: 'Продукти',
+            href: '/products',
+            dropdown: [
+                { name: 'Всички продукти', href: '/products' },
+                { name: 'Нови постъпления', href: '/products?sort=new' },
+                { name: 'Намаления', href: '/products?sale=true' },
+                { name: 'Бестселъри', href: '/products?featured=true' },
+            ],
+        },
+        {
+            name: 'Категории',
+            href: '/categories',
+            dropdown: categories.length > 0 ? categories : undefined, // динамични категории
+        },
+        { name: 'Колекции', href: '/collections' },
+        { name: 'За нас', href: '/about' },
+        { name: 'Контакти', href: '/contact' },
+    ];
+
     return (
         <nav className="border-b bg-white">
             <div className="container">

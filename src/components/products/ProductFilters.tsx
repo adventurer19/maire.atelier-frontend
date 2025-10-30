@@ -1,18 +1,36 @@
-// src/components/products/ProductFilters.tsx
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { categoriesApi } from '@/lib/api/categories';
+import type { Category } from '@/lib/api/categories';
 
 export default function ProductFilters() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const handleCategoryChange = (categoryId: string) => {
+    useEffect(() => {
+        async function fetchCategories() {
+            try {
+                const data = await categoriesApi.getAll();
+                setCategories(data);
+            } catch (error) {
+                console.error('❌ Error loading categories:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchCategories();
+    }, []);
+
+    const handleCategoryChange = (categorySlug: string) => {
         const params = new URLSearchParams(searchParams);
-        if (categoryId) {
-            params.set('category', categoryId);
+        if (categorySlug) {
+            params.set('category', categorySlug);
         } else {
             params.delete('category');
         }
@@ -28,9 +46,7 @@ export default function ProductFilters() {
         router.push(`/products?${params.toString()}`);
     };
 
-    const clearFilters = () => {
-        router.push('/products');
-    };
+    const clearFilters = () => router.push('/products');
 
     return (
         <div className="bg-white rounded-lg p-6 sticky top-24">
@@ -47,48 +63,41 @@ export default function ProductFilters() {
             {/* Categories */}
             <div className="mb-6">
                 <h3 className="text-sm font-semibold text-gray-900 mb-3">Категории</h3>
-                <ul className="space-y-2">
-                    <li>
-                        <button
-                            onClick={() => handleCategoryChange('')}
-                            className={`text-sm w-full text-left py-1 ${
-                                !searchParams.get('category') ? 'text-gray-900 font-medium' : 'text-gray-600 hover:text-gray-900'
-                            }`}
-                        >
-                            Всички
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            onClick={() => handleCategoryChange('1')}
-                            className={`text-sm w-full text-left py-1 ${
-                                searchParams.get('category') === '1' ? 'text-gray-900 font-medium' : 'text-gray-600 hover:text-gray-900'
-                            }`}
-                        >
-                            Рокли
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            onClick={() => handleCategoryChange('2')}
-                            className={`text-sm w-full text-left py-1 ${
-                                searchParams.get('category') === '2' ? 'text-gray-900 font-medium' : 'text-gray-600 hover:text-gray-900'
-                            }`}
-                        >
-                            Блузи
-                        </button>
-                    </li>
-                    <li>
-                        <button
-                            onClick={() => handleCategoryChange('3')}
-                            className={`text-sm w-full text-left py-1 ${
-                                searchParams.get('category') === '3' ? 'text-gray-900 font-medium' : 'text-gray-600 hover:text-gray-900'
-                            }`}
-                        >
-                            Панталони
-                        </button>
-                    </li>
-                </ul>
+
+                {loading ? (
+                    <p className="text-sm text-gray-400">Зареждане...</p>
+                ) : (
+                    <ul className="space-y-2">
+                        <li>
+                            <button
+                                onClick={() => handleCategoryChange('')}
+                                className={`text-sm w-full text-left py-1 ${
+                                    !searchParams.get('category')
+                                        ? 'text-gray-900 font-medium'
+                                        : 'text-gray-600 hover:text-gray-900'
+                                }`}
+                            >
+                                Всички
+                            </button>
+                        </li>
+                        {categories.map((cat) => (
+                            <li key={cat.id}>
+                                <button
+                                    onClick={() => handleCategoryChange(cat.slug)}
+                                    className={`text-sm w-full text-left py-1 ${
+                                        searchParams.get('category') === cat.slug
+                                            ? 'text-gray-900 font-medium'
+                                            : 'text-gray-600 hover:text-gray-900'
+                                    }`}
+                                >
+                                    {typeof cat.name === 'string'
+                                        ? cat.name
+                                        : cat.name.bg || cat.name.en}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
 
             {/* Price Range */}

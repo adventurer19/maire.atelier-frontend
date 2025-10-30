@@ -64,21 +64,20 @@ function ProductCard({ product }: { product: Product }) {
                     <h3 className="font-medium text-gray-900 mb-1 group-hover:text-gray-600 transition-colors line-clamp-2">
                         {productName}
                     </h3>
-
                     <div className="flex items-center gap-2">
                         {product.sale_price ? (
                             <>
-                <span className="text-lg font-bold text-gray-900">
-                  {product.sale_price.toFixed(2)} лв
-                </span>
+      <span className="text-lg font-bold text-gray-900">
+        {Number(product.sale_price).toFixed(2)} лв
+      </span>
                                 <span className="text-sm text-gray-500 line-through">
-                  {product.price.toFixed(2)} лв
-                </span>
+        {Number(product.price).toFixed(2)} лв
+      </span>
                             </>
                         ) : (
                             <span className="text-lg font-bold text-gray-900">
-                {product.price.toFixed(2)} лв
-              </span>
+      {Number(product.final_price ?? product.price).toFixed(2)} лв
+    </span>
                         )}
                     </div>
                 </div>

@@ -2,8 +2,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { LanguageProvider } from "@/context/LanguageContext";
 
-// ✅ SEO / OpenGraph / Meta настройки
 export const metadata: Metadata = {
     title: {
         default: "MAIRE ATELIER – Modern Fashion",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     },
     description: "Модерен бранд за мода и стил – MAIRE Atelier.",
     keywords: ["мода", "дрехи", "рокли", "аксесоари", "fashion", "онлайн магазин"],
-    metadataBase: new URL("https://maire.atelier"), // ако имаш продакшън домейн
+    metadataBase: new URL("https://maire.atelier"),
     openGraph: {
         title: "MAIRE ATELIER",
         description: "Онлайн магазин за модерна мода",
@@ -24,14 +24,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
                                        children,
-                                   }: Readonly<{
+                                   }: {
     children: React.ReactNode;
-}>) {
+}) {
     return (
         <html lang="bg" className="scroll-smooth">
         <body className="bg-white text-gray-900 antialiased">
-        {/* ✅ QueryProvider обгръща всичко */}
-        <QueryProvider>{children}</QueryProvider>
+        <LanguageProvider>
+            <QueryProvider>{children}</QueryProvider>
+        </LanguageProvider>
         </body>
         </html>
     );

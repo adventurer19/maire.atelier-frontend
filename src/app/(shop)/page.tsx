@@ -3,29 +3,58 @@ import HeroSection from '@/components/home/HeroSection';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import CategoryGrid from '@/components/home/CategoryGrid';
 import Newsletter from '@/components/home/Newsletter';
+import { categoriesApi } from '@/lib/api/categories';
 
 export const metadata = {
     title: 'MAIRE ATELIER - Modern Fashion',
     description: 'Открийте нашата колекция от уникални модни дрехи',
 };
 
+/**
+ * Fetch featured products from API
+ */
 async function getFeaturedProducts() {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/products/featured`, {
-            next: { revalidate: 60 }, // кешира 60 сек
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/featured`, {
+            next: { revalidate: 60 }, // Cache for 60 seconds
         });
 
         if (!res.ok) throw new Error("Failed to fetch featured products");
         const data = await res.json();
-        return data.products ?? data.data ?? [];
+        return data.data ?? [];
     } catch (err) {
         console.error("❌ Error fetching featured products:", err);
         return [];
     }
 }
 
+/**
+ * Fetch featured categories from API
+ */
+async function getFeaturedCategories() {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
+            next: { revalidate: 300 }, // Cache for 5 minutes (categories change less often)
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch categories");
+        const data = await res.json();
+
+        // Filter only featured categories
+        const categories = data.data ?? [];
+        return categories.filter((cat: any) => cat.is_featured);
+    } catch (err) {
+        console.error("❌ Error fetching categories:", err);
+        return [];
+    }
+}
+
 export default async function HomePage() {
-    const featuredProducts = await getFeaturedProducts();
+    // Fetch data in parallel for better performance
+    const [featuredProducts, featuredCategories] = await Promise.all([
+        getFeaturedProducts(),
+        getFeaturedCategories(),
+    ]);
 
     return (
         <div className="min-h-screen">
@@ -62,7 +91,13 @@ export default async function HomePage() {
                         <p className="text-gray-600">Разгледайте нашите колекции</p>
                     </div>
 
-                    <CategoryGrid />
+                    {featuredCategories.length > 0 ? (
+                        <CategoryGrid categories={featuredCategories} />
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-gray-500">Зареждане на категории...</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -72,7 +107,9 @@ export default async function HomePage() {
     );
 }
 
-// ✅ Loading skeleton
+/**
+ * Loading skeleton for featured products
+ */
 function FeaturedProductsSkeleton() {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -40,6 +40,7 @@ export interface Product {
     variants: ProductVariant[];
     images: string[];
     primary_image: string;
+    thumbnail?: string;
 
     // Meta
     meta_title: string | { bg: string; en: string };
@@ -53,10 +54,22 @@ export interface Product {
 export interface Category {
     id: number;
     slug: string;
+    parent_id: number | null;
     name: string | { bg: string; en: string };
     description: string | { bg: string; en: string };
-    parent_id: number | null;
+    meta_title: string | { bg: string; en: string };
+    meta_description: string | { bg: string; en: string };
+
+    // Display
+    image?: string;
     position: number;
+    is_active: boolean;
+    is_featured: boolean;
+    show_in_menu: boolean;
+
+    // Relations (optional, loaded when needed)
+    children?: Category[];
+    products?: Product[];
 }
 
 export interface ProductVariant {

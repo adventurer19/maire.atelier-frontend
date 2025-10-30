@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, Suspense } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/ui/Logo';
 import SearchBar from './SearchBar';
 import CartButton from './CartButton';
-import { Suspense } from 'react';
 import LogoutButton from '@/components/auth/LogoutButton';
+import { Globe } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
+// ============================
+// HEADER COMPONENT
+// ============================
 export default function Header() {
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [isPending, startTransition] = useTransition();
 
-    // ✅ Взимаме текущия потребител (чрез API proxy)
+    // ✅ Взимаме текущия потребител
     useEffect(() => {
         startTransition(async () => {
             try {
@@ -83,7 +87,10 @@ export default function Header() {
                             </Link>
                         )}
 
-                        {/* Cart */}
+                        {/* 🌍 Language Switcher */}
+                        <LanguageDropdown />
+
+                        {/* 🛒 Cart */}
                         <Suspense fallback={<CartButtonSkeleton />}>
                             <CartButton />
                         </Suspense>
@@ -103,7 +110,56 @@ export default function Header() {
     );
 }
 
-// Icons
+// ============================
+// LANGUAGE DROPDOWN COMPONENT
+// ============================
+function LanguageDropdown() {
+    const { lang, setLang } = useLanguage();
+    const [open, setOpen] = useState(false);
+
+    const languages = [
+        { code: 'bg', label: 'Български', flag: '🇧🇬' },
+        { code: 'en', label: 'English', flag: '🇬🇧' },
+    ];
+
+    return (
+        <div className="relative">
+            <button
+                onClick={() => setOpen((o) => !o)}
+                className="flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="Change language"
+            >
+                <Globe className="w-5 h-5 text-gray-600" />
+            </button>
+
+            {open && (
+                <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-md w-36 py-1 z-50 animate-in fade-in-0 zoom-in-95">
+                    {languages.map((l) => (
+                        <button
+                            key={l.code}
+                            onClick={() => {
+                                setLang(l.code);
+                                setOpen(false);
+                            }}
+                            className={`flex items-center gap-2 w-full text-left px-3 py-1.5 text-sm ${
+                                l.code === lang
+                                    ? 'bg-gray-900 text-white font-semibold'
+                                    : 'hover:bg-gray-100 text-gray-800'
+                            }`}
+                        >
+                            <span>{l.flag}</span>
+                            {l.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ============================
+// ICONS & SKELETONS
+// ============================
 function SearchIcon() {
     return (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

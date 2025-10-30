@@ -1,83 +1,73 @@
-// src/app/(shop)/categories/[slug]/page.tsx
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { productsApi } from "@/lib/api/products";
-import ProductGrid from "@/components/products/ProductGrid";
+import { notFound } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import type { Category } from '@/types';
 
-interface CategoryPageProps {
-    params: { slug: string };
-    searchParams: { page?: string };
-}
-
-/**
- * Fetch products for the given category slug
- */
-async function getCategoryProducts(slug: string, page = 1) {
+async function getCategory(slug: string): Promise<Category | null> {
     try {
-        const res = await productsApi.getProducts({
-            category_slug: slug,
-            page,
-            per_page: 12,
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/${slug}`, {
+            next: { revalidate: 300 },
         });
-        return res;
-    } catch (error) {
-        console.error("❌ Error loading category products:", error);
+
+        if (!res.ok) throw new Error('Failed to fetch category');
+        const data = await res.json();
+
+        // API може да връща { data: {...} } или просто {...}
+        return data.data ?? data ?? null;
+    } catch (err) {
+        console.error('❌ Error fetching category:', err);
         return null;
     }
 }
 
-/**
- * Generate SEO metadata for the category page
- */
-export async function generateMetadata({ params }: CategoryPageProps) {
-    const categorySlug = params.slug.replace(/-/g, " ");
-    return {
-        title: `${categorySlug} | MAIRE ATELIER`,
-        description: `Разгледайте продуктите от категория "${categorySlug}".`,
-    };
-}
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+    // ✅ Новият начин: await params преди достъп
+    const { slug } = await params;
 
-/**
- * Category Page Component
- */
-export default async function CategoryPage({
-                                               params,
-                                               searchParams,
-                                           }: CategoryPageProps) {
-    const page = Number(searchParams.page) || 1;
-    const productsData = await getCategoryProducts(params.slug, page);
+    const category = await getCategory(slug);
+    if (!category) return notFound();
 
-    if (!productsData || !productsData.data?.length) {
-        notFound();
-    }
+    const image = category.image || `/categories/${category.slug}.jpg`;
 
     return (
-        <div className="min-h-screen bg-white">
-            {/* Breadcrumbs */}
-            <div className="border-b">
-                <div className="container py-4">
-                    <nav className="flex items-center gap-2 text-sm text-gray-600">
-                        <Link href="/" className="hover:text-gray-900">
-                            Начало
-                        </Link>
-                        <span>/</span>
-                        <Link href="/products" className="hover:text-gray-900">
-                            Продукти
-                        </Link>
-                        <span>/</span>
-                        <span className="text-gray-900 capitalize">{params.slug}</span>
-                    </nav>
+        <div className="min-h-screen bg-gray-50">
+            {/* Hero section */}
+            <div className="relative w-full h-80 bg-gray-200 overflow-hidden">
+                <Image
+                    src={image}
+                    alt={category.name?.bg || category.name || 'Category'}
+                    fill
+                    className="object-cover"
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://placehold.co/1200x600/e5e5e5/666666?text=Category';
+                    }}
+                />
+                <div className="absolute inset-0 bg-black/50 flex flex-col justify-center items-center text-white">
+                    <h1 className="text-4xl font-serif font-bold">{category.name?.bg || category.name}</h1>
+                    {category.description && (
+                        <p className="text-lg text-gray-200 max-w-2xl text-center mt-4">
+                            {typeof category.description === 'string'
+                                ? category.description
+                                : category.description.bg || category.description.en}
+                        </p>
+                    )}
                 </div>
             </div>
 
-            {/* Category Title */}
-            <div className="container py-8 sm:py-12">
-                <h1 className="text-3xl font-serif font-bold mb-6 capitalize">
-                    {params.slug.replace(/-/g, " ")}
-                </h1>
+            {/* Content */}
+            <div className="container py-12">
+                <Link
+                    href="/categories"
+                    className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                    ← Обратно към категориите
+                </Link>
 
-                {/* Product Grid */}
-                <ProductGrid products={productsData.data} pagination={productsData.meta} />
+                <div className="mt-10">
+                    <h2 className="text-2xl font-serif font-bold mb-4">Продукти в тази категория</h2>
+                    {/* TODO: тук можеш да заредиш продукти по категория */}
+                </div>
             </div>
         </div>
     );

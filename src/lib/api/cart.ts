@@ -21,17 +21,8 @@ interface CartValidationResponse {
     };
 }
 
-/**
- * Cart API Client
- *
- * Този файл съдържа всички API заявки към Laravel backend-а за кошницата.
- * Използва apiClient (axios instance) за комуникация с REST API endpoints.
- */
 export const cartApi = {
-    /**
-     * Взема цялата кошница с продукти и обобщение (summary)
-     * GET /api/cart
-     */
+
     getCart: async (): Promise<Cart> => {
         const response = await apiClient.get<ApiResponse<Cart>>('/cart');
         return response.data.data;
