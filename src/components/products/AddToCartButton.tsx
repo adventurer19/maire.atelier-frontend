@@ -11,6 +11,7 @@ interface AddToCartButtonProps {
     quantity?: number;
     className?: string;
     showQuantitySelector?: boolean;
+    disabled?: boolean;
 }
 
 export default function AddToCartButton({
@@ -19,6 +20,7 @@ export default function AddToCartButton({
                                             quantity: initialQuantity = 1,
                                             className = '',
                                             showQuantitySelector = false,
+                                            disabled = false,
                                         }: AddToCartButtonProps) {
     const [quantity, setQuantity] = useState(initialQuantity);
     const [notification, setNotification] = useState<{
@@ -29,6 +31,12 @@ export default function AddToCartButton({
     const addToCart = useAddToCart();
 
     const handleAddToCart = async () => {
+        if (disabled) return;
+        if (!variantId && typeof variantId !== 'number') {
+            setNotification({ type: 'error', message: 'Моля, изберете вариант.' });
+            setTimeout(() => setNotification(null), 2500);
+            return;
+        }
         try {
             const payload: AddToCartPayload = {
                 product_id: productId,
@@ -48,7 +56,10 @@ export default function AddToCartButton({
             // Show error notification
             setNotification({
                 type: 'error',
-                message: error.response?.data?.message || 'Failed to add to cart',
+                message:
+                    error?.response?.data?.message ||
+                    error?.message ||
+                    'Failed to add to cart',
             });
             setTimeout(() => setNotification(null), 3000);
         }
@@ -88,7 +99,7 @@ export default function AddToCartButton({
                 <button
                     type="button"
                     onClick={handleAddToCart}
-                    disabled={isLoading}
+                    disabled={isLoading || disabled}
                     className={`
             flex-1 px-6 py-3 
             bg-gray-900 text-white font-medium 

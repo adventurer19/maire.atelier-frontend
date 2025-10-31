@@ -2,10 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
+    const guestToken = req.headers.get('x-cart-token') || '';
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Cart-Token': guestToken,
+            // forward locale if provided by client
+            'Accept-Language': req.headers.get('accept-language') || 'bg',
+        },
         body: JSON.stringify(body),
     });
 
@@ -16,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     const token = data.token as string;
 
-    const response = NextResponse.json({ user: data.user }, { status: 200 });
+    const response = NextResponse.json({ user: data.user, token }, { status: 200 });
     response.cookies.set('auth_token', token, {
         httpOnly: true,
         sameSite: 'lax',

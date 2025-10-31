@@ -20,7 +20,55 @@ interface ProductsResponse {
     meta?: PaginationMeta;
 }
 
-const productsCache = new Map<string, any>();
+// Simple in-memory cache with TTL and request coalescing
+const CACHE_TTL_MS = 60_000; // 1 min
+const productsCache = new Map<string, { expiresAt: number; value: any }>();
+const pendingRequests = new Map<string, Promise<any>>();
+
+function getCached(key: string) {
+    const item = productsCache.get(key);
+    if (!item) return null;
+    if (Date.now() > item.expiresAt) {
+        productsCache.delete(key);
+        return null;
+    }
+    return item.value;
+}
+
+function setCached(key: string, value: any, ttlMs: number = CACHE_TTL_MS) {
+    productsCache.set(key, { expiresAt: Date.now() + ttlMs, value });
+}
+
+async function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Persistent cache via localStorage (best-effort)
+function getPersistent(key: string) {
+    if (typeof window === 'undefined') return null;
+    try {
+        const raw = localStorage.getItem(`catalog:${key}`);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (Date.now() > parsed.expiresAt) {
+            localStorage.removeItem(`catalog:${key}`);
+            return null;
+        }
+        return parsed.value;
+    } catch {
+        return null;
+    }
+}
+
+function setPersistent(key: string, value: any, ttlMs: number = CACHE_TTL_MS) {
+    if (typeof window === 'undefined') return;
+    try {
+        localStorage.setItem(
+            `catalog:${key}`,
+            JSON.stringify({ expiresAt: Date.now() + ttlMs, value })
+        );
+    } catch {}
+}
 
 /**
  * Products API module for Laravel
@@ -36,9 +84,14 @@ export const productsApi = {
      */
     getProducts: async (params?: ProductsParams): Promise<ProductsResponse> => {
         const cacheKey = JSON.stringify(params || {});
-        if (productsCache.has(cacheKey)) {
-            return productsCache.get(cacheKey);
+        const cached = getCached(cacheKey) ?? getPersistent(cacheKey);
+        if (cached) return cached;
+
+        if (pendingRequests.has(cacheKey)) {
+            return pendingRequests.get(cacheKey)!;
         }
+
+        const requestPromise = (async () => {
         try {
             // Build query params
             const queryParams: Record<string, any> = {};
@@ -53,7 +106,23 @@ export const productsApi = {
             if (params?.in_stock) queryParams.in_stock = 1;
             if (params?.on_sale) queryParams.on_sale = 1;
 
-            const res = await apiClient.get("/products", { params: queryParams });
+            // Retry with backoff on 429
+            let attempt = 0;
+            let res;
+            while (true) {
+                try {
+                    res = await apiClient.get("/products", { params: queryParams });
+                    break;
+                } catch (err: any) {
+                    if (err.response?.status === 429 && attempt < 2) {
+                        const delay = 300 * Math.pow(2, attempt) + Math.floor(Math.random() * 100);
+                        await sleep(delay);
+                        attempt++;
+                        continue;
+                    }
+                    throw err;
+                }
+            }
 
             // Laravel returns { data: [...], meta: {...} }
             const data = res.data?.data ?? [];
@@ -65,7 +134,8 @@ export const productsApi = {
             };
 
             const result = { data, meta };
-            productsCache.set(cacheKey, result);
+            setCached(cacheKey, result);
+            setPersistent(cacheKey, result);
             return result;
         } catch (error: any) {
             if (error.response?.status === 429) {
@@ -82,7 +152,13 @@ export const productsApi = {
                     total: 0,
                 },
             };
+        } finally {
+            pendingRequests.delete(cacheKey);
         }
+        })();
+
+        pendingRequests.set(cacheKey, requestPromise);
+        return requestPromise;
     },
 
     /**
@@ -133,10 +209,29 @@ export const productsApi = {
      * Fetch a single product by slug
      */
     getProduct: async (slug: string): Promise<Product | null> => {
+        const cacheKey = `product:${slug}`;
+        const cached = getCached(cacheKey) ?? getPersistent(cacheKey);
+        if (cached) return cached;
         try {
-            const res = await apiClient.get(`/products/${slug}`);
-            // Laravel returns { data: {...} }, so extract inner data
-            return res.data?.data ?? null;
+            let attempt = 0;
+            let res;
+            while (true) {
+                try {
+                    res = await apiClient.get(`/products/${slug}`);
+                    break;
+                } catch (err: any) {
+                    if (err.response?.status === 429 && attempt < 2) {
+                        await sleep(300 * Math.pow(2, attempt));
+                        attempt++;
+                        continue;
+                    }
+                    throw err;
+                }
+            }
+            const data = res.data?.data ?? null;
+            setCached(cacheKey, data);
+            setPersistent(cacheKey, data);
+            return data;
         } catch (error) {
             console.error("❌ Error fetching product:", error);
             return null;
@@ -147,11 +242,28 @@ export const productsApi = {
      * Fetch featured products
      */
     getFeatured: async (limit: number = 8): Promise<Product[]> => {
+        const cacheKey = `featured:${limit}`;
+        const cached = getCached(cacheKey) ?? getPersistent(cacheKey);
+        if (cached) return cached;
         try {
-            const res = await apiClient.get("/products/featured", {
-                params: { limit },
-            });
+            let attempt = 0;
+            let res;
+            while (true) {
+                try {
+                    res = await apiClient.get("/products/featured", { params: { limit } });
+                    break;
+                } catch (err: any) {
+                    if (err.response?.status === 429 && attempt < 2) {
+                        await sleep(300 * Math.pow(2, attempt));
+                        attempt++;
+                        continue;
+                    }
+                    throw err;
+                }
+            }
             const data = res.data?.data ?? [];
+            setCached(cacheKey, data);
+            setPersistent(cacheKey, data);
             return data;
         } catch (error) {
             console.error("❌ Error fetching featured products:", error);
@@ -166,13 +278,25 @@ export const productsApi = {
         query: string,
         params?: Omit<ProductsParams, 'search'>
     ): Promise<ProductsResponse> => {
+        const cacheKey = `search:${query}:${JSON.stringify(params || {})}`;
+        const cached = getCached(cacheKey) ?? getPersistent(cacheKey);
+        if (cached) return cached;
         try {
-            const res = await apiClient.get("/search", {
-                params: {
-                    q: query,
-                    ...params,
-                },
-            });
+            let attempt = 0;
+            let res;
+            while (true) {
+                try {
+                    res = await apiClient.get("/search", { params: { q: query, ...params } });
+                    break;
+                } catch (err: any) {
+                    if (err.response?.status === 429 && attempt < 2) {
+                        await sleep(300 * Math.pow(2, attempt));
+                        attempt++;
+                        continue;
+                    }
+                    throw err;
+                }
+            }
 
             const data = res.data?.data ?? [];
             const meta = res.data?.meta ?? {
@@ -182,7 +306,10 @@ export const productsApi = {
                 total: data.length,
             };
 
-            return { data, meta };
+            const result = { data, meta };
+            setCached(cacheKey, result);
+            setPersistent(cacheKey, result);
+            return result;
         } catch (error) {
             console.error("❌ Error searching products:", error);
             return {

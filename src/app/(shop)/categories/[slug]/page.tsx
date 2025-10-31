@@ -17,18 +17,24 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         const products = res.data.products || [];
         const breadcrumb = res.data.breadcrumb || [];
 
+        // Fallbacks if name/description are localized objects
+        const getLocalized = (val: any) => {
+            if (typeof val === 'string') return val;
+            return val?.bg || val?.en || '';
+        };
+
         return (
             <div className="container py-10">
                 <Breadcrumbs
                     items={[
                         { label: 'Категории', href: '/categories' },
-                        { label: category.name },
+                        { label: getLocalized(category.name) },
                     ]}
                 />
 
-                <h1 className="text-3xl font-serif font-bold mb-3">{category.name}</h1>
+                <h1 className="text-3xl font-serif font-bold mb-3">{getLocalized(category.name)}</h1>
                 {category.description && (
-                    <p className="text-gray-600 mb-8 max-w-2xl">{category.description}</p>
+                    <p className="text-gray-600 mb-8 max-w-2xl">{getLocalized(category.description)}</p>
                 )}
 
                 {products.length > 0 ? (
@@ -38,7 +44,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-500">Няма продукти в тази категория.</p>
+                    <p className="text-gray-500">{/* i18n placeholder */}Няма продукти в тази категория.</p>
                 )}
             </div>
         );

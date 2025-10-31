@@ -3,19 +3,21 @@
 
 import Link from 'next/link';
 import Logo from '@/components/ui/Logo';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Footer() {
+    const { t } = useLanguage();
     return (
         <footer className="bg-[#0E0E11] text-[#EAEAEA] pt-12 pb-10 border-t border-b border-white border-opacity-10">
             <div className="container px-6 max-w-7xl mx-auto">
                 {/* Newsletter Section */}
                 <div className="max-w-4xl mx-auto mb-12 text-center">
-                    <h2 className="text-2xl font-semibold mb-4 tracking-wide">Join our newsletter</h2>
-                    <p className="text-[#999] mb-6 max-w-lg mx-auto">Subscribe to receive the latest updates, offers, and style inspiration.</p>
+                    <h2 className="text-2xl font-semibold mb-4 tracking-wide">{t('footer.newsletter_title', { default: '' }) || 'Join our newsletter'}</h2>
+                    <p className="text-[#999] mb-6 max-w-lg mx-auto">{t('footer.newsletter_subtitle', { default: '' }) || 'Subscribe to receive the latest updates, offers, and style inspiration.'}</p>
                     <form className="flex justify-center gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
                         <input
                             type="email"
-                            placeholder="Enter your email"
+                            placeholder={t('footer.email_placeholder', { default: '' }) || 'Enter your email'}
                             aria-label="Email address"
                             required
                             className="w-full px-4 py-3 rounded bg-[#1A1A1A] text-[#EAEAEA] placeholder-[#999] border border-[#333] focus:outline-none focus:ring-2 focus:ring-[#EAEAEA]"
@@ -24,7 +26,7 @@ export default function Footer() {
                             type="submit"
                             className="px-6 py-3 bg-[#EAEAEA] text-[#0E0E11] font-semibold rounded hover:bg-[#d4d4d4] transition-colors"
                         >
-                            Subscribe
+                            {t('footer.subscribe') || 'Subscribe'}
                         </button>
                     </form>
                 </div>
@@ -35,7 +37,7 @@ export default function Footer() {
                     <div>
                         <Logo variant="light" className="mb-6" />
                         <p className="text-[#999] leading-relaxed mb-6 text-sm">
-                            Модерна мода с фокус върху качеството и елегантността. Открийте вашия перфектен стил.
+                            {t('footer.brand_text')}
                         </p>
                         <div className="flex space-x-5">
                             <a
@@ -65,31 +67,31 @@ export default function Footer() {
 
                     {/* Navigation Links */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-6 tracking-wide">Навигация</h3>
+                        <h3 className="text-lg font-semibold mb-6 tracking-wide">{t('footer.navigation') || 'Navigation'}</h3>
                         <nav className="flex flex-col space-y-3 text-sm text-[#999]">
-                            <FooterLink href="/products">Продукти</FooterLink>
-                            <FooterLink href="/collections">Колекции</FooterLink>
-                            <FooterLink href="/about">За нас</FooterLink>
-                            <FooterLink href="/contact">Контакти</FooterLink>
-                            <FooterLink href="/blog">Блог</FooterLink>
+                            <FooterLink href="/products">{t('navigation.products')}</FooterLink>
+                            <FooterLink href="/collections">{t('navigation.collections')}</FooterLink>
+                            <FooterLink href="/about">{t('navigation.about')}</FooterLink>
+                            <FooterLink href="/contact">{t('navigation.contact')}</FooterLink>
+                            <FooterLink href="/blog">{t('footer.blog') || 'Blog'}</FooterLink>
                         </nav>
                     </div>
 
                     {/* Customer Service */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-6 tracking-wide">Помощ</h3>
+                        <h3 className="text-lg font-semibold mb-6 tracking-wide">{t('footer.help') || 'Help'}</h3>
                         <nav className="flex flex-col space-y-3 text-sm text-[#999]">
-                            <FooterLink href="/shipping">Доставка</FooterLink>
-                            <FooterLink href="/returns">Връщане</FooterLink>
-                            <FooterLink href="/size-guide">Размери</FooterLink>
-                            <FooterLink href="/faq">Въпроси</FooterLink>
-                            <FooterLink href="/terms">Условия</FooterLink>
+                            <FooterLink href="/shipping">{t('footer.shipping') || 'Shipping'}</FooterLink>
+                            <FooterLink href="/returns">{t('footer.returns') || 'Returns'}</FooterLink>
+                            <FooterLink href="/size-guide">{t('footer.size_guide') || 'Size Guide'}</FooterLink>
+                            <FooterLink href="/faq">{t('footer.faq') || 'FAQ'}</FooterLink>
+                            <FooterLink href="/terms">{t('footer.terms') || 'Terms'}</FooterLink>
                         </nav>
                     </div>
 
                     {/* Contact Info */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-6 tracking-wide">Контакти</h3>
+                        <h3 className="text-lg font-semibold mb-6 tracking-wide">{t('navigation.contact')}</h3>
                         <address className="not-italic space-y-4 text-sm text-[#999]">
                             <a href="mailto:info@maire-atelier.com" className="flex items-center gap-3 hover:underline hover:text-[#EAEAEA] transition">
                                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -108,7 +110,7 @@ export default function Footer() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span>София, България</span>
+                                <span>{t('footer.address') || 'Sofia, Bulgaria'}</span>
                             </div>
                         </address>
                     </div>
@@ -117,16 +119,16 @@ export default function Footer() {
                 {/* Bottom Bar */}
                 <div className="mt-12 border-t border-white border-opacity-10 pt-6">
                     <div className="flex flex-col sm:flex-row justify-center items-center gap-6 text-xs text-[#999] tracking-wide">
-                        <p>© {new Date().getFullYear()} MAIRE ATELIER. Всички права запазени.</p>
+                        <p>© {new Date().getFullYear()} MAIRE ATELIER. {t('footer.rights') || 'All rights reserved.'}</p>
                         <nav className="flex space-x-6">
                             <Link href="/privacy" className="hover:underline hover:text-[#EAEAEA] transition">
-                                Поверителност
+                                {t('footer.privacy') || 'Privacy'}
                             </Link>
                             <Link href="/terms" className="hover:underline hover:text-[#EAEAEA] transition">
-                                Условия
+                                {t('footer.terms') || 'Terms'}
                             </Link>
                             <Link href="/cookies" className="hover:underline hover:text-[#EAEAEA] transition">
-                                Бисквитки
+                                {t('footer.cookies') || 'Cookies'}
                             </Link>
                         </nav>
                     </div>

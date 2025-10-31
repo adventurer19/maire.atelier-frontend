@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import AddToCartButton from './AddToCartButton';
 import { Product } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface ProductInfoProps {
     product: Product;
 }
 
 export default function ProductInfo({ product }: ProductInfoProps) {
+    const { t } = useLanguage();
     const [selectedVariant, setSelectedVariant] = useState(product.variants[0]?.id || null);
     const [quantity, setQuantity] = useState(1);
 
@@ -59,15 +61,15 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                 {selectedVariantData ? (
                     selectedVariantData.is_in_stock ? (
                         <p className="text-green-600 flex items-center gap-2">
-                            ✅ В наличност ({selectedVariantData.stock_quantity} бр.)
+                            ✅ {t('product.in_stock')} ({selectedVariantData.stock_quantity})
                         </p>
                     ) : (
                         <p className="text-red-600 flex items-center gap-2">
-                            ❌ Изчерпан
+                            ❌ {t('product.out_of_stock')}
                         </p>
                     )
                 ) : (
-                    <p className="text-gray-500">Изберете вариант</p>
+                    <p className="text-gray-500">{t('product.choose_variant')}</p>
                 )}
             </div>
 
@@ -75,7 +77,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             {product.variants?.length > 0 && (
                 <div>
                     <label className="block text-sm font-medium text-gray-900 mb-3">
-                        Изберете вариант:
+                        {t('product.choose_variant')}:
                     </label>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -137,7 +139,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             {/* ✅ Quantity Selector */}
             <div>
                 <label className="block text-sm font-medium text-gray-900 mb-3">
-                    Количество:
+                    {t('product.quantity')}:
                 </label>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center border border-gray-300 rounded-lg">
@@ -183,7 +185,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
                 />
 
                 <button className="w-full px-6 py-4 border-2 border-gray-900 text-gray-900 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                    ❤️ Добави в любими
+                    ❤️ {t('product.add_to_wishlist')}
                 </button>
             </div>
 
@@ -191,7 +193,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             {product.categories?.length > 0 && (
                 <div className="pt-6 border-t border-gray-200">
                     <p className="text-sm text-gray-600">
-                        Категории:{' '}
+                        {t('product.categories')}: 
                         {product.categories
                             .map((cat) =>
                                 typeof cat.name === 'string'

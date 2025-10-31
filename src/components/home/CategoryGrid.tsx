@@ -3,15 +3,17 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Category } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface CategoryGridProps {
     categories: Category[];
 }
 
 export default function CategoryGrid({ categories }: CategoryGridProps) {
+    const { t, lang } = useLanguage();
     const getCategoryName = (category: Category): string => {
         if (typeof category.name === 'string') return category.name;
-        return category.name.bg || category.name.en || 'Category';
+        return category.name?.[lang] || category.name.bg || category.name.en || 'Category';
     };
 
     const getCategoryImage = (category: Category): string => {
@@ -21,7 +23,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
     if (!categories || categories.length === 0) {
         return (
             <div className="text-center py-12">
-                <p className="text-gray-500">Няма налични категории</p>
+                <p className="text-gray-500">{t('categories.empty') || 'Няма налични категории'}</p>
             </div>
         );
     }

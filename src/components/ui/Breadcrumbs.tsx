@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface BreadcrumbItem {
     label: string;
@@ -13,6 +14,7 @@ interface BreadcrumbsProps {
 }
 
 export default function Breadcrumbs({ items }: BreadcrumbsProps) {
+    const { t } = useLanguage();
     if (!items || items.length === 0) return null;
 
     return (
@@ -23,7 +25,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
                         href="/"
                         className="hover:text-gray-900 font-medium transition-colors"
                     >
-                        Начало
+                        {t('navigation.home')}
                     </Link>
                 </li>
 

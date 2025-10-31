@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Category } from '@/lib/api/categories';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface ProductFiltersProps {
     categories: Category[];
@@ -12,6 +13,7 @@ interface ProductFiltersProps {
 export default function ProductFilters({ categories, currentCategory }: ProductFiltersProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { t, lang } = useLanguage();
 
     // Initialize price range from URL params
     const [priceRange, setPriceRange] = useState({
@@ -68,18 +70,18 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
     return (
         <div className="bg-white rounded-lg p-6">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">Филтри</h2>
+                <h2 className="text-lg font-semibold text-gray-900">{t('filters.title') || 'Филтри'}</h2>
                 <button
                     onClick={clearFilters}
                     className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
                 >
-                    Изчисти
+                    {t('filters.clear') || 'Изчисти'}
                 </button>
             </div>
 
             {/* Categories */}
             <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Категории</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('filters.categories') || 'Категории'}</h3>
                 <ul className="space-y-2">
                     <li>
                         <button
@@ -90,7 +92,7 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
                                     : 'text-gray-600 hover:text-gray-900'
                             }`}
                         >
-                            Всички
+                            {t('filters.all') || 'Всички'}
                         </button>
                     </li>
                     {categories.map((cat) => (
@@ -105,7 +107,7 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
                             >
                                 {typeof cat.name === 'string'
                                     ? cat.name
-                                    : cat.name.bg || cat.name.en}
+                                    : cat.name?.[lang] || cat.name?.bg || cat.name?.en}
                             </button>
                         </li>
                     ))}
@@ -114,11 +116,11 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
 
             {/* Price Range */}
             <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Цена (лв)</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('filters.price') || 'Цена (лв)'}</h3>
                 <div className="flex gap-2 mb-2">
                     <input
                         type="number"
-                        placeholder="От"
+                        placeholder={t('filters.price_from') || 'От'}
                         value={priceRange.min}
                         onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
@@ -126,7 +128,7 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
                     />
                     <input
                         type="number"
-                        placeholder="До"
+                        placeholder={t('filters.price_to') || 'До'}
                         value={priceRange.max}
                         onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
@@ -137,13 +139,13 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
                     onClick={handlePriceFilter}
                     className="w-full px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
                 >
-                    Приложи
+                    {t('filters.apply') || 'Приложи'}
                 </button>
             </div>
 
             {/* Availability */}
             <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Наличност</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('filters.availability') || 'Наличност'}</h3>
                 <label className="flex items-center gap-2 cursor-pointer">
                     <input
                         type="checkbox"
@@ -151,7 +153,7 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
                         onChange={(e) => handleAvailabilityChange(e.target.checked)}
                         className="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
                     />
-                    <span className="text-sm text-gray-600">Само продукти в наличност</span>
+                    <span className="text-sm text-gray-600">{t('filters.only_in_stock') || 'Само продукти в наличност'}</span>
                 </label>
             </div>
         </div>

@@ -3,6 +3,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Category } from '@/lib/api/categories';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface ActiveFiltersProps {
     categories: Category[];
@@ -11,6 +12,7 @@ interface ActiveFiltersProps {
 export default function ActiveFilters({ categories }: ActiveFiltersProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { t, lang } = useLanguage();
 
     const category = searchParams.get('category');
     const priceMin = searchParams.get('price_min');
@@ -47,12 +49,12 @@ export default function ActiveFilters({ categories }: ActiveFiltersProps) {
     const getCategoryName = (slug: string) => {
         const cat = categories.find(c => c.slug === slug);
         if (!cat) return slug;
-        return typeof cat.name === 'string' ? cat.name : cat.name.bg || cat.name.en;
+        return typeof cat.name === 'string' ? cat.name : cat.name?.[lang] || cat.name?.bg || cat.name?.en;
     };
 
     return (
         <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="text-sm text-gray-600">Активни филтри:</span>
+            <span className="text-sm text-gray-600">{t('filters.active') || 'Активни филтри:'}</span>
 
             {category && (
                 <button
@@ -71,7 +73,7 @@ export default function ActiveFilters({ categories }: ActiveFiltersProps) {
                     onClick={removePriceFilter}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white rounded-full text-sm hover:bg-gray-800 transition-colors"
                 >
-                    <span>Цена: {priceMin || '0'} - {priceMax || '∞'} лв</span>
+                    <span>{t('filters.price') || 'Цена'}: {priceMin || '0'} - {priceMax || '∞'}</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -83,7 +85,7 @@ export default function ActiveFilters({ categories }: ActiveFiltersProps) {
                     onClick={() => removeFilter('in_stock')}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white rounded-full text-sm hover:bg-gray-800 transition-colors"
                 >
-                    <span>В наличност</span>
+                    <span>{t('filters.only_in_stock') || 'В наличност'}</span>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -95,7 +97,7 @@ export default function ActiveFilters({ categories }: ActiveFiltersProps) {
                     onClick={clearAllFilters}
                     className="text-sm text-gray-600 hover:text-gray-900 underline ml-2 transition-colors"
                 >
-                    Изчисти всички
+                    {t('filters.clear_all') || 'Изчисти всички'}
                 </button>
             )}
         </div>

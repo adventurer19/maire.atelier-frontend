@@ -7,10 +7,13 @@ import MobileFiltersButton from '@/components/products/MobileFiltersButton';
 import ActiveFilters from '@/components/products/ActiveFilters';
 import { productsApi } from '@/lib/api/products';
 import { categoriesApi } from '@/lib/api/categories';
+import ProductsHeaderClient from './ProductsHeaderClient';
+import PaginationClient from './PaginationClient';
+import EmptyStateClient from './EmptyStateClient';
 
 export const metadata = {
-    title: 'Продукти | MAIRE ATELIER',
-    description: 'Разгледайте нашата пълна колекция от модни дрехи',
+    title: 'Products | MAIRE ATELIER',
+    description: 'Browse our full fashion collection',
 };
 
 interface ProductsPageProps {
@@ -93,17 +96,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Page Header */}
-            <div className="bg-white border-b">
-                <div className="container py-8">
-                    <h1 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-2">
-                        Продукти
-                    </h1>
-                    <p className="text-gray-600">
-                        Открийте нашата колекция от {totalProducts} {totalProducts === 1 ? 'продукт' : 'продукта'}
-                    </p>
-                </div>
-            </div>
+            <ProductsHeaderClient totalProducts={totalProducts} />
 
             <div className="container py-8">
                 <div className="flex flex-col lg:flex-row gap-8">
@@ -132,7 +125,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                             <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
                                 {/* Results Count */}
                                 <div className="text-sm text-gray-600">
-                                    Показани {products.length} от {totalProducts}
+                                    {/* client-only text replaced in toolbar count if needed later */}
+                                    
                                 </div>
 
                                 {/* Sort Dropdown */}
@@ -152,12 +146,12 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                                     {/* Pagination - if needed */}
                                     {meta && meta.last_page > 1 && (
                                         <div className="mt-8">
-                                            <Pagination meta={meta} />
+                                            <PaginationClient current_page={meta.current_page} last_page={meta.last_page} />
                                         </div>
                                     )}
                                 </>
                             ) : (
-                                <EmptyState />
+                                <EmptyStateClient />
                             )}
                         </Suspense>
                     </div>
@@ -177,38 +171,6 @@ function ProductsGridSkeleton() {
                     <div className="h-4 bg-gray-200 rounded w-1/2" />
                 </div>
             ))}
-        </div>
-    );
-}
-
-function EmptyState() {
-    return (
-        <div className="text-center py-16">
-            <svg
-                className="mx-auto h-16 w-16 text-gray-400 mb-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-            >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Няма намерени продукти
-            </h3>
-            <p className="text-gray-500 mb-6">
-                Опитайте да промените филтрите или да търсите нещо друго
-            </p>
-            <a
-                href="/products"
-                className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-            >
-                Изчисти филтри
-            </a>
         </div>
     );
 }

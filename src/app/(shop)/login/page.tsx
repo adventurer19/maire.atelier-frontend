@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getOrCreateCartToken } from "@/lib/cartToken";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -13,7 +14,10 @@ export default function LoginPage() {
 
         const res = await fetch("/api/auth/login", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "X-Cart-Token": getOrCreateCartToken(),
+            },
             body: JSON.stringify({ email, password }),
         });
 
@@ -21,6 +25,12 @@ export default function LoginPage() {
             const data = await res.json();
             setError(data.message || "Invalid credentials");
             return;
+        }
+
+        // store token for axios Authorization header
+        const data = await res.json();
+        if (data?.token) {
+            localStorage.setItem('auth_token', data.token);
         }
 
         // след успешен login — redirect

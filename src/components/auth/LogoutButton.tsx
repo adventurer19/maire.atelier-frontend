@@ -7,6 +7,8 @@ export default function LogoutButton() {
 
     const handleLogout = async () => {
         await fetch("/api/auth/logout", { method: "POST" });
+        // remove token used by axios Authorization header
+        try { localStorage.removeItem('auth_token'); } catch {}
         router.push("/"); // или "/login"
         router.refresh(); // презарежда server components с изчистен cookie
     };

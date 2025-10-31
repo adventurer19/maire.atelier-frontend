@@ -22,6 +22,14 @@ export function useProducts(params?: any) {
     return useQuery({
         queryKey: productKeys.list(params),
         queryFn: () => productsApi.getProducts(params),
+        staleTime: 60_000, // 1 minute
+        gcTime: 5 * 60_000,
+        refetchOnWindowFocus: false,
+        retry: (failureCount, error: any) => {
+            const status = (error as any)?.response?.status;
+            if (status === 429 && failureCount < 2) return true;
+            return failureCount < 3;
+        },
     });
 }
 
@@ -43,5 +51,8 @@ export function useFeaturedProducts() {
     return useQuery({
         queryKey: productKeys.featured(),
         queryFn: () => productsApi.getFeatured(),
+        staleTime: 60_000,
+        gcTime: 5 * 60_000,
+        refetchOnWindowFocus: false,
     });
 }

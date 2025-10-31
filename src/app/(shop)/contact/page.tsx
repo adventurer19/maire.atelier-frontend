@@ -3,9 +3,11 @@
 
 import { useState } from 'react';
 import { siteData } from '@/data/siteData'
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function ContactPage() {
     const { contact } = siteData;
+    const { t } = useLanguage();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -48,11 +50,11 @@ export default function ContactPage() {
                 <div className="grid lg:grid-cols-2 gap-12">
                     {/* Contact Form */}
                     <div className="bg-white rounded-lg p-8 shadow-sm">
-                        <h2 className="text-2xl font-bold mb-6">Изпратете съобщение</h2>
+                        <h2 className="text-2xl font-bold mb-6">{t('contact.send_message')}</h2>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-2">Име</label>
+                                <label className="block text-sm font-medium mb-2">{t('contact.name')}</label>
                                 <input
                                     type="text"
                                     name="name"
@@ -64,7 +66,7 @@ export default function ContactPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium mb-2">Email</label>
+                                <label className="block text-sm font-medium mb-2">{t('contact.email')}</label>
                                 <input
                                     type="email"
                                     name="email"
@@ -76,7 +78,7 @@ export default function ContactPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium mb-2">Тема</label>
+                                <label className="block text-sm font-medium mb-2">{t('contact.subject')}</label>
                                 <input
                                     type="text"
                                     name="subject"
@@ -88,7 +90,7 @@ export default function ContactPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium mb-2">Съобщение</label>
+                                <label className="block text-sm font-medium mb-2">{t('contact.message')}</label>
                                 <textarea
                                     name="message"
                                     value={formData.message}
@@ -103,12 +105,12 @@ export default function ContactPage() {
                                 type="submit"
                                 className="w-full py-3 bg-gray-900 text-white font-medium rounded-md hover:bg-gray-800 transition-colors"
                             >
-                                Изпрати
+                                {t('contact.submit')}
                             </button>
 
                             {submitted && (
                                 <div className="p-4 bg-green-100 text-green-800 rounded-md text-center">
-                                    Съобщението е изпратено успешно!
+                                    {t('contact.success')}
                                 </div>
                             )}
                         </form>
@@ -118,7 +120,7 @@ export default function ContactPage() {
                     <div className="space-y-8">
                         {/* Contact Details */}
                         <div className="bg-white rounded-lg p-8 shadow-sm">
-                            <h3 className="text-xl font-bold mb-6">Информация за контакт</h3>
+                            <h3 className="text-xl font-bold mb-6">{t('contact.info_title')}</h3>
 
                             <div className="space-y-4">
                                 <div className="flex items-start gap-3">
@@ -134,7 +136,7 @@ export default function ContactPage() {
                                 <div className="flex items-start gap-3">
                                     <PhoneIcon className="w-5 h-5 text-gray-600 mt-1" />
                                     <div>
-                                        <div className="font-medium">Телефон</div>
+                                        <div className="font-medium">{t('contact.phone')}</div>
                                         <a href={`tel:${contact.info.phone}`} className="text-gray-600 hover:text-gray-900">
                                             {contact.info.phone}
                                         </a>
@@ -144,7 +146,7 @@ export default function ContactPage() {
                                 <div className="flex items-start gap-3">
                                     <LocationIcon className="w-5 h-5 text-gray-600 mt-1" />
                                     <div>
-                                        <div className="font-medium">Адрес</div>
+                                        <div className="font-medium">{t('contact.address')}</div>
                                         <div className="text-gray-600">
                                             {contact.info.address.street}<br />
                                             {contact.info.address.city}, {contact.info.address.zip}<br />
@@ -157,7 +159,7 @@ export default function ContactPage() {
 
                         {/* Working Hours */}
                         <div className="bg-white rounded-lg p-8 shadow-sm">
-                            <h3 className="text-xl font-bold mb-6">Работно време</h3>
+                            <h3 className="text-xl font-bold mb-6">{t('contact.working_hours')}</h3>
                             <div className="space-y-2 text-gray-600">
                                 <div>{contact.info.workingHours.weekdays}</div>
                                 <div>{contact.info.workingHours.saturday}</div>
@@ -167,7 +169,7 @@ export default function ContactPage() {
 
                         {/* Social */}
                         <div className="bg-white rounded-lg p-8 shadow-sm">
-                            <h3 className="text-xl font-bold mb-6">Последвайте ни</h3>
+                            <h3 className="text-xl font-bold mb-6">{t('contact.follow_us')}</h3>
                             <div className="flex gap-4">
                                 {contact.social.map((social) => (
                                     <a
@@ -187,7 +189,7 @@ export default function ContactPage() {
 
                 {/* FAQ */}
                 <div className="mt-16 bg-white rounded-lg p-8 shadow-sm">
-                    <h2 className="text-2xl font-bold mb-8 text-center">Често Задавани Въпроси</h2>
+                    <h2 className="text-2xl font-bold mb-8 text-center">{t('contact.faq_title')}</h2>
                     <div className="grid md:grid-cols-2 gap-8">
                         {contact.faq.map((item, index) => (
                             <div key={index}>

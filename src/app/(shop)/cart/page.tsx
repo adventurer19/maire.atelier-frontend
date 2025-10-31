@@ -132,12 +132,12 @@ export default function CartPage() {
                                     {item.product.name}
                                 </Link>
 
-                                {item.variant && (
+                                {item.variant?.attributes && typeof item.variant.attributes === 'object' && (
                                     <p className="text-sm text-gray-600 mt-1">
-                                        {Object.entries(item.variant.attributes).map(([key, value]) => (
-                                            <span key={key} className="mr-2">
-                        {key}: {value}
-                      </span>
+                                        {Object.entries(item.variant.attributes as Record<string, any>).map(([key, value]) => (
+                                            <span key={key as string} className="mr-2">
+                                                {key}: {String(value)}
+                                            </span>
                                         ))}
                                     </p>
                                 )}

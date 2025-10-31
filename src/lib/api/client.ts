@@ -63,8 +63,13 @@ apiClient.interceptors.response.use(
         // Различни видове грешки
         if (status === 403) console.error("🚫 Forbidden");
         if (status === 404) console.error("❌ Resource not found");
-        if (status === 422)
-            console.error("⚠️ Validation error", error.response?.data?.errors);
+        if (status === 422) {
+            const validation = error.response?.data;
+            console.error(
+                "⚠️ Validation error",
+                validation?.errors || validation?.message || validation
+            );
+        }
 
         if (status === 500) {
             const backendMessage =

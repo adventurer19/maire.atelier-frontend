@@ -1,7 +1,9 @@
 // src/components/home/FeaturedProducts.tsx
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/types';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface FeaturedProductsProps {
     products: Product[];
@@ -18,6 +20,7 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
 }
 
 function ProductCard({ product }: { product: Product }) {
+    const { t } = useLanguage();
     const productName = typeof product.name === 'string'
         ? product.name
         : product.name.bg || product.name.en;
@@ -47,14 +50,14 @@ function ProductCard({ product }: { product: Product }) {
                     {/* Low Stock Badge */}
                     {product.is_low_stock && product.is_in_stock && (
                         <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded">
-                            Малко количество
+                            {t('product.low_stock', { count: String(product.stock_quantity ?? '') })}
                         </div>
                     )}
 
                     {/* Out of Stock Overlay */}
                     {!product.is_in_stock && (
                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                            <span className="text-white font-medium">Изчерпан</span>
+                            <span className="text-white font-medium">{t('product.out_of_stock')}</span>
                         </div>
                     )}
                 </div>
@@ -68,15 +71,15 @@ function ProductCard({ product }: { product: Product }) {
                         {product.sale_price ? (
                             <>
       <span className="text-lg font-bold text-gray-900">
-        {Number(product.sale_price).toFixed(2)} лв
+        {Number(product.sale_price).toFixed(2)}
       </span>
                                 <span className="text-sm text-gray-500 line-through">
-        {Number(product.price).toFixed(2)} лв
+        {Number(product.price).toFixed(2)}
       </span>
                             </>
                         ) : (
                             <span className="text-lg font-bold text-gray-900">
-      {Number(product.final_price ?? product.price).toFixed(2)} лв
+      {Number(product.final_price ?? product.price).toFixed(2)}
     </span>
                         )}
                     </div>
