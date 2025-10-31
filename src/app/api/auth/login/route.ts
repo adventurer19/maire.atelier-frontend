@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getApiBaseUrl } from '@/lib/api/config';
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
     const guestToken = req.headers.get('x-cart-token') || '';
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/login`, {
+    const res = await fetch(`${getApiBaseUrl()}/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

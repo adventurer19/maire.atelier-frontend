@@ -98,11 +98,11 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <div className="min-h-screen bg-gray-50">
             <ProductsHeaderClient totalProducts={totalProducts} />
 
-            <div className="container py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
+            <div className="container px-3 md:px-4 lg:px-6 py-4 md:py-6 lg:py-8">
+                <div className="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8">
                     {/* Sidebar Filters - Desktop */}
                     <aside className="hidden lg:block w-64 flex-shrink-0">
-                        <div className="sticky top-4">
+                        <div className="sticky top-20">
                             <ProductFilters
                                 categories={categories}
                                 currentCategory={currentCategory}
@@ -111,9 +111,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     </aside>
 
                     {/* Main Content */}
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                         {/* Toolbar */}
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 bg-white p-4 rounded-lg shadow-sm gap-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 bg-white p-3 md:p-4 rounded-lg shadow-sm gap-3 md:gap-4">
                             <div className="flex items-center gap-3 w-full sm:w-auto">
                                 {/* Mobile Filters Button */}
                                 <MobileFiltersButton

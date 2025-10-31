@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { categoriesApi } from '@/lib/api/categories';
 import ProductCard from '@/components/products/ProductCard';
-import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import CategoryBreadcrumbs from './CategoryBreadcrumbs';
 
 export const revalidate = 60;
 
@@ -23,14 +23,11 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             return val?.bg || val?.en || '';
         };
 
+        const categoryName = getLocalized(category.name);
+
         return (
             <div className="container py-10">
-                <Breadcrumbs
-                    items={[
-                        { label: 'Категории', href: '/categories' },
-                        { label: getLocalized(category.name) },
-                    ]}
-                />
+                <CategoryBreadcrumbs categoryName={categoryName} />
 
                 <h1 className="text-3xl font-serif font-bold mb-3">{getLocalized(category.name)}</h1>
                 {category.description && (

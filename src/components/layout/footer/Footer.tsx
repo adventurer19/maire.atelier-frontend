@@ -11,20 +11,20 @@ export default function Footer() {
         <footer className="bg-[#0E0E11] text-[#EAEAEA] pt-12 pb-10 border-t border-b border-white border-opacity-10">
             <div className="container px-6 max-w-7xl mx-auto">
                 {/* Newsletter Section */}
-                <div className="max-w-4xl mx-auto mb-12 text-center">
-                    <h2 className="text-2xl font-semibold mb-4 tracking-wide">{t('footer.newsletter_title', { default: '' }) || 'Join our newsletter'}</h2>
-                    <p className="text-[#999] mb-6 max-w-lg mx-auto">{t('footer.newsletter_subtitle', { default: '' }) || 'Subscribe to receive the latest updates, offers, and style inspiration.'}</p>
-                    <form className="flex justify-center gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
+                <div className="max-w-4xl mx-auto mb-8 md:mb-10 lg:mb-12 text-center px-4 pt-8 md:pt-10 lg:pt-12 pb-8 md:pb-10 lg:pb-12 border-t border-b border-white border-opacity-10">
+                    <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4 tracking-wide">{t('footer.newsletter_title', { default: '' }) || 'Join our newsletter'}</h2>
+                    <p className="text-sm md:text-base text-[#999] mb-4 md:mb-6 max-w-lg mx-auto">{t('footer.newsletter_subtitle', { default: '' }) || 'Subscribe to receive the latest updates, offers, and style inspiration.'}</p>
+                    <form className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
                         <input
                             type="email"
                             placeholder={t('footer.email_placeholder', { default: '' }) || 'Enter your email'}
                             aria-label="Email address"
                             required
-                            className="w-full px-4 py-3 rounded bg-[#1A1A1A] text-[#EAEAEA] placeholder-[#999] border border-[#333] focus:outline-none focus:ring-2 focus:ring-[#EAEAEA]"
+                            className="w-full px-4 py-3 md:py-3 rounded bg-[#1A1A1A] text-[#EAEAEA] placeholder-[#999] border border-[#333] focus:outline-none focus:ring-2 focus:ring-[#EAEAEA] text-sm md:text-base min-h-[48px]"
                         />
                         <button
                             type="submit"
-                            className="px-6 py-3 bg-[#EAEAEA] text-[#0E0E11] font-semibold rounded hover:bg-[#d4d4d4] transition-colors"
+                            className="px-6 py-3 md:py-3 bg-[#EAEAEA] text-[#0E0E11] font-semibold rounded hover:bg-[#d4d4d4] active:bg-[#c4c4c4] transition-colors text-sm md:text-base min-h-[48px] whitespace-nowrap touch-manipulation"
                         >
                             {t('footer.subscribe') || 'Subscribe'}
                         </button>
@@ -32,7 +32,7 @@ export default function Footer() {
                 </div>
 
                 {/* Main Footer Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-12 px-4 sm:px-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-8 md:gap-y-10 gap-x-6 md:gap-x-8 lg:gap-x-12 px-4 sm:px-6">
                     {/* Brand & Social */}
                     <div>
                         <Logo variant="light" className="mb-6" />
@@ -67,8 +67,8 @@ export default function Footer() {
 
                     {/* Navigation Links */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-6 tracking-wide">{t('footer.navigation') || 'Navigation'}</h3>
-                        <nav className="flex flex-col space-y-3 text-sm text-[#999]">
+                        <h3 className="text-base md:text-lg font-semibold mb-4 md:mb-6 tracking-wide">{t('footer.navigation') || 'Navigation'}</h3>
+                        <nav className="flex flex-col space-y-2 md:space-y-3 text-sm text-[#999]">
                             <FooterLink href="/products">{t('navigation.products')}</FooterLink>
                             <FooterLink href="/collections">{t('navigation.collections')}</FooterLink>
                             <FooterLink href="/about">{t('navigation.about')}</FooterLink>
@@ -79,8 +79,8 @@ export default function Footer() {
 
                     {/* Customer Service */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-6 tracking-wide">{t('footer.help') || 'Help'}</h3>
-                        <nav className="flex flex-col space-y-3 text-sm text-[#999]">
+                        <h3 className="text-base md:text-lg font-semibold mb-4 md:mb-6 tracking-wide">{t('footer.help') || 'Help'}</h3>
+                        <nav className="flex flex-col space-y-2 md:space-y-3 text-sm text-[#999]">
                             <FooterLink href="/shipping">{t('footer.shipping') || 'Shipping'}</FooterLink>
                             <FooterLink href="/returns">{t('footer.returns') || 'Returns'}</FooterLink>
                             <FooterLink href="/size-guide">{t('footer.size_guide') || 'Size Guide'}</FooterLink>
@@ -91,8 +91,8 @@ export default function Footer() {
 
                     {/* Contact Info */}
                     <div>
-                        <h3 className="text-lg font-semibold mb-6 tracking-wide">{t('navigation.contact')}</h3>
-                        <address className="not-italic space-y-4 text-sm text-[#999]">
+                        <h3 className="text-base md:text-lg font-semibold mb-4 md:mb-6 tracking-wide">{t('navigation.contact')}</h3>
+                        <address className="not-italic space-y-3 md:space-y-4 text-sm text-[#999]">
                             <a href="mailto:info@maire-atelier.com" className="flex items-center gap-3 hover:underline hover:text-[#EAEAEA] transition">
                                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -117,8 +117,8 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="mt-12 border-t border-white border-opacity-10 pt-6">
-                    <div className="flex flex-col sm:flex-row justify-center items-center gap-6 text-xs text-[#999] tracking-wide">
+                <div className="mt-8 md:mt-10 lg:mt-12 border-t border-white border-opacity-10 pt-4 md:pt-6">
+                    <div className="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6 text-xs text-[#999] tracking-wide px-4">
                         <p>© {new Date().getFullYear()} MAIRE ATELIER. {t('footer.rights') || 'All rights reserved.'}</p>
                         <nav className="flex space-x-6">
                             <Link href="/privacy" className="hover:underline hover:text-[#EAEAEA] transition">

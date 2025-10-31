@@ -101,3 +101,9 @@ export interface ApiResponse<T> {
     data: T;
     meta?: PaginationMeta;
 }
+
+// Export order types
+export type { Order, OrderItem, OrderAddress } from './order';
+
+// Export collection types
+export type { Collection } from './collection';

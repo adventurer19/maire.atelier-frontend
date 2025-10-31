@@ -3,9 +3,11 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/context/LanguageContext';
 import { cn } from '@/lib/utils/cn';
 
 export default function SearchBar() {
+    const { t } = useLanguage();
     const [query, setQuery] = useState('');
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
@@ -25,7 +27,7 @@ export default function SearchBar() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Търси продукти..."
+                placeholder={t('general.search_placeholder')}
                 className={cn(
                     "w-full h-10 pl-4 pr-10 rounded-lg border border-gray-200",
                     "focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent",

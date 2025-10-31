@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useLanguage } from '@/context/LanguageContext';
 import type { Category } from '@/types';
 
 interface CategoryCardProps {
@@ -10,6 +11,8 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category, featured = false }: CategoryCardProps) {
+    const { t, lang } = useLanguage();
+    
     const categoryName =
         typeof category.name === 'string'
             ? category.name
@@ -63,12 +66,14 @@ export function CategoryCard({ category, featured = false }: CategoryCardProps) 
                 {childrenCount > 0 && (
                     <div className="text-sm text-gray-300 mb-3">
                         {childrenCount}{' '}
-                        {childrenCount === 1 ? 'подкатегория' : 'подкатегории'}
+                        {childrenCount === 1 
+                            ? t('categories.subcategory_singular') 
+                            : t('categories.subcategory_plural')}
                     </div>
                 )}
 
                 <div className="flex items-center gap-2 text-white group-hover:gap-3 transition-all">
-                    <span className="text-sm font-medium">Разгледай</span>
+                    <span className="text-sm font-medium">{t('categories.explore')}</span>
                     <svg
                         className="w-4 h-4"
                         fill="none"
@@ -87,7 +92,7 @@ export function CategoryCard({ category, featured = false }: CategoryCardProps) 
 
             {featured && (
                 <div className="absolute top-4 right-4 bg-white text-gray-900 px-3 py-1 rounded-full text-xs font-bold">
-                    Препоръчано
+                    {t('categories.recommended')}
                 </div>
             )}
         </Link>

@@ -1,10 +1,11 @@
 import { cookies } from "next/headers";
+import { getApiBaseUrl } from "@/lib/api/config";
 
 export async function getCurrentUser() {
     const token = (await cookies()).get("auth_token")?.value;
     if (!token) return null;
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/user`, {
+    const res = await fetch(`${getApiBaseUrl()}/user`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
     });

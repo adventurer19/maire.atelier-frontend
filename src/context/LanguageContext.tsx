@@ -21,12 +21,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const saved = localStorage.getItem('lang');
-        if (saved === 'bg' || saved === 'en') setLangState(saved);
+        if (saved === 'bg' || saved === 'en') {
+            setLangState(saved);
+            // Also sync cookie
+            document.cookie = `lang=${saved}; path=/; max-age=31536000; SameSite=Lax`;
+        }
     }, []);
 
     const setLang = (newLang: Language) => {
         setLangState(newLang);
         localStorage.setItem('lang', newLang);
+        // Also set cookie for server components
+        document.cookie = `lang=${newLang}; path=/; max-age=31536000; SameSite=Lax`;
     };
 
     // 🧠 t() с поддръжка на nested ключове (product.in_stock)

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { LanguageProvider } from "@/context/LanguageContext";
+import CookieBanner from "@/components/ui/CookieBanner";
 
 export const metadata: Metadata = {
     title: {
@@ -31,7 +32,10 @@ export default function RootLayout({
         <html lang="bg" className="scroll-smooth">
         <body className="bg-white text-gray-900 antialiased">
         <LanguageProvider>
-            <QueryProvider>{children}</QueryProvider>
+            <QueryProvider>
+                {children}
+                <CookieBanner />
+            </QueryProvider>
         </LanguageProvider>
         </body>
         </html>

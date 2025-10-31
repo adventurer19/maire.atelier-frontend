@@ -11,7 +11,7 @@ interface FeaturedProductsProps {
 
 export default function FeaturedProducts({ products }: FeaturedProductsProps) {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
             {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
             ))}
@@ -42,14 +42,14 @@ function ProductCard({ product }: { product: Product }) {
 
                     {/* Discount Badge */}
                     {product.discount_percentage && (
-                        <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                        <div className="absolute top-2 right-2 md:top-3 md:right-3 bg-red-500 text-white text-[10px] md:text-xs font-bold px-1.5 md:px-2 py-0.5 md:py-1 rounded">
                             -{product.discount_percentage}%
                         </div>
                     )}
 
                     {/* Low Stock Badge */}
                     {product.is_low_stock && product.is_in_stock && (
-                        <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded">
+                        <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-orange-500 text-white text-[10px] md:text-xs font-medium px-1.5 md:px-2 py-0.5 md:py-1 rounded">
                             {t('product.low_stock', { count: String(product.stock_quantity ?? '') })}
                         </div>
                     )}
@@ -57,30 +57,30 @@ function ProductCard({ product }: { product: Product }) {
                     {/* Out of Stock Overlay */}
                     {!product.is_in_stock && (
                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                            <span className="text-white font-medium">{t('product.out_of_stock')}</span>
+                            <span className="text-white font-medium text-xs md:text-sm">{t('product.out_of_stock')}</span>
                         </div>
                     )}
                 </div>
 
                 {/* Product Info */}
                 <div>
-                    <h3 className="font-medium text-gray-900 mb-1 group-hover:text-gray-600 transition-colors line-clamp-2">
+                    <h3 className="font-medium text-xs md:text-sm text-gray-900 mb-1 md:mb-1.5 group-hover:text-gray-600 transition-colors line-clamp-2 leading-tight">
                         {productName}
                     </h3>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
                         {product.sale_price ? (
                             <>
-      <span className="text-lg font-bold text-gray-900">
-        {Number(product.sale_price).toFixed(2)}
-      </span>
-                                <span className="text-sm text-gray-500 line-through">
-        {Number(product.price).toFixed(2)}
-      </span>
+                                <span className="text-base md:text-lg font-bold text-gray-900">
+                                    {Number(product.sale_price).toFixed(2)} лв
+                                </span>
+                                <span className="text-xs md:text-sm text-gray-500 line-through">
+                                    {Number(product.price).toFixed(2)} лв
+                                </span>
                             </>
                         ) : (
-                            <span className="text-lg font-bold text-gray-900">
-      {Number(product.final_price ?? product.price).toFixed(2)}
-    </span>
+                            <span className="text-base md:text-lg font-bold text-gray-900">
+                                {Number(product.final_price ?? product.price).toFixed(2)} лв
+                            </span>
                         )}
                     </div>
                 </div>

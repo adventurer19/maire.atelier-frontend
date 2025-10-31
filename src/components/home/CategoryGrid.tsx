@@ -72,8 +72,8 @@ function CategoryCard({ category, name, image }: CategoryCardProps) {
             />
 
             {/* Category Name */}
-            <div className="relative z-20 h-full flex items-end p-3 sm:p-4 md:p-6">
-                <h3 className="text-lg sm:text-xl md:text-2xl font-serif font-bold text-white">
+            <div className="relative z-20 h-full flex items-end p-3 md:p-4 lg:p-6">
+                <h3 className="text-base md:text-lg lg:text-xl xl:text-2xl font-serif font-bold text-white leading-tight">
                     {name}
                 </h3>
             </div>

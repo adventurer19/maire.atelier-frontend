@@ -32,7 +32,7 @@ export default function MobileFiltersButton({ categories, currentCategory }: Mob
             {/* Filters Button - Only visible on mobile */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="lg:hidden flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 shadow-sm"
+                className="lg:hidden flex items-center justify-center gap-2 px-3 md:px-4 py-2.5 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors text-xs md:text-sm font-medium text-gray-700 shadow-sm min-h-[44px] touch-manipulation"
             >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -83,7 +83,7 @@ export default function MobileFiltersButton({ categories, currentCategory }: Mob
                         <div className="sticky bottom-0 bg-white border-t px-4 py-4 shadow-lg">
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="w-full px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                                className="w-full px-6 py-3.5 md:py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 active:bg-gray-700 transition-colors text-sm md:text-base min-h-[48px] touch-manipulation"
                             >
                                 {t('filters.apply') || 'Приложи филтри'}
                             </button>

@@ -68,28 +68,28 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
     };
 
     return (
-        <div className="bg-white rounded-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">{t('filters.title') || 'Филтри'}</h2>
+        <div className="bg-white rounded-lg p-4 md:p-6">
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+                <h2 className="text-base md:text-lg font-semibold text-gray-900">{t('filters.title') || 'Филтри'}</h2>
                 <button
                     onClick={clearFilters}
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-xs md:text-sm text-gray-600 hover:text-gray-900 active:text-gray-700 transition-colors touch-manipulation py-1 px-2"
                 >
                     {t('filters.clear') || 'Изчисти'}
                 </button>
             </div>
 
             {/* Categories */}
-            <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('filters.categories') || 'Категории'}</h3>
-                <ul className="space-y-2">
+            <div className="mb-4 md:mb-6">
+                <h3 className="text-xs md:text-sm font-semibold text-gray-900 mb-2 md:mb-3">{t('filters.categories') || 'Категории'}</h3>
+                <ul className="space-y-1.5 md:space-y-2 max-h-[200px] md:max-h-none overflow-y-auto">
                     <li>
                         <button
                             onClick={() => handleCategoryChange('')}
-                            className={`text-sm w-full text-left py-1 transition-colors ${
+                            className={`text-xs md:text-sm w-full text-left py-1.5 md:py-1 px-2 transition-colors touch-manipulation ${
                                 !currentCategory
                                     ? 'text-gray-900 font-medium'
-                                    : 'text-gray-600 hover:text-gray-900'
+                                    : 'text-gray-600 hover:text-gray-900 active:text-gray-700'
                             }`}
                         >
                             {t('filters.all') || 'Всички'}
@@ -99,10 +99,10 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
                         <li key={cat.id}>
                             <button
                                 onClick={() => handleCategoryChange(cat.slug)}
-                                className={`text-sm w-full text-left py-1 transition-colors ${
+                                className={`text-xs md:text-sm w-full text-left py-1.5 md:py-1 px-2 transition-colors touch-manipulation ${
                                     currentCategory === cat.slug
                                         ? 'text-gray-900 font-medium'
-                                        : 'text-gray-600 hover:text-gray-900'
+                                        : 'text-gray-600 hover:text-gray-900 active:text-gray-700'
                                 }`}
                             >
                                 {typeof cat.name === 'string'
@@ -115,15 +115,15 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
             </div>
 
             {/* Price Range */}
-            <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('filters.price') || 'Цена (лв)'}</h3>
+            <div className="mb-4 md:mb-6">
+                <h3 className="text-xs md:text-sm font-semibold text-gray-900 mb-2 md:mb-3">{t('filters.price') || 'Цена (лв)'}</h3>
                 <div className="flex gap-2 mb-2">
                     <input
                         type="number"
                         placeholder={t('filters.price_from') || 'От'}
                         value={priceRange.min}
                         onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                        className="w-full px-3 py-2.5 md:py-2 border-2 border-gray-300 rounded-lg text-sm md:text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 min-h-[44px] md:min-h-[auto]"
                         min="0"
                     />
                     <input
@@ -131,29 +131,29 @@ export default function ProductFilters({ categories, currentCategory }: ProductF
                         placeholder={t('filters.price_to') || 'До'}
                         value={priceRange.max}
                         onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                        className="w-full px-3 py-2.5 md:py-2 border-2 border-gray-300 rounded-lg text-sm md:text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 min-h-[44px] md:min-h-[auto]"
                         min="0"
                     />
                 </div>
                 <button
                     onClick={handlePriceFilter}
-                    className="w-full px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                    className="w-full px-4 py-2.5 md:py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 active:bg-gray-700 transition-colors min-h-[44px] md:min-h-[auto] touch-manipulation"
                 >
                     {t('filters.apply') || 'Приложи'}
                 </button>
             </div>
 
             {/* Availability */}
-            <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('filters.availability') || 'Наличност'}</h3>
-                <label className="flex items-center gap-2 cursor-pointer">
+            <div>
+                <h3 className="text-xs md:text-sm font-semibold text-gray-900 mb-2 md:mb-3">{t('filters.availability') || 'Наличност'}</h3>
+                <label className="flex items-center gap-2 cursor-pointer touch-manipulation py-1">
                     <input
                         type="checkbox"
                         checked={searchParams.get('in_stock') === '1'}
                         onChange={(e) => handleAvailabilityChange(e.target.checked)}
-                        className="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                        className="w-5 h-5 md:w-4 md:h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
                     />
-                    <span className="text-sm text-gray-600">{t('filters.only_in_stock') || 'Само продукти в наличност'}</span>
+                    <span className="text-xs md:text-sm text-gray-600">{t('filters.only_in_stock') || 'Само продукти в наличност'}</span>
                 </label>
             </div>
         </div>
