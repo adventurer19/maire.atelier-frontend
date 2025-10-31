@@ -1,60 +1,77 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { categoriesApi } from '@/lib/api/categories';
 import type { Category } from '@/lib/api/categories';
 
-export default function ProductFilters() {
+interface ProductFiltersProps {
+    categories: Category[];
+    currentCategory?: string;
+}
+
+export default function ProductFilters({ categories, currentCategory }: ProductFiltersProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        async function fetchCategories() {
-            try {
-                const data = await categoriesApi.getAll();
-                setCategories(data);
-            } catch (error) {
-                console.error('❌ Error loading categories:', error);
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchCategories();
-    }, []);
+    // Initialize price range from URL params
+    const [priceRange, setPriceRange] = useState({
+        min: searchParams.get('price_min') || '',
+        max: searchParams.get('price_max') || '',
+    });
 
     const handleCategoryChange = (categorySlug: string) => {
-        const params = new URLSearchParams(searchParams);
+        const params = new URLSearchParams(searchParams.toString());
         if (categorySlug) {
             params.set('category', categorySlug);
         } else {
             params.delete('category');
         }
-        params.delete('page');
+        params.delete('page'); // Reset to first page when filtering
         router.push(`/products?${params.toString()}`);
     };
 
     const handlePriceFilter = () => {
-        const params = new URLSearchParams(searchParams);
-        if (priceRange.min) params.set('min_price', priceRange.min);
-        if (priceRange.max) params.set('max_price', priceRange.max);
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (priceRange.min) {
+            params.set('price_min', priceRange.min);
+        } else {
+            params.delete('price_min');
+        }
+
+        if (priceRange.max) {
+            params.set('price_max', priceRange.max);
+        } else {
+            params.delete('price_max');
+        }
+
+        params.delete('page'); // Reset to first page
+        router.push(`/products?${params.toString()}`);
+    };
+
+    const handleAvailabilityChange = (checked: boolean) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (checked) {
+            params.set('in_stock', '1');
+        } else {
+            params.delete('in_stock');
+        }
         params.delete('page');
         router.push(`/products?${params.toString()}`);
     };
 
-    const clearFilters = () => router.push('/products');
+    const clearFilters = () => {
+        setPriceRange({ min: '', max: '' });
+        router.push('/products');
+    };
 
     return (
-        <div className="bg-white rounded-lg p-6 sticky top-24">
+        <div className="bg-white rounded-lg p-6">
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">Филтри</h2>
                 <button
                     onClick={clearFilters}
-                    className="text-sm text-gray-600 hover:text-gray-900"
+                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
                 >
                     Изчисти
                 </button>
@@ -63,41 +80,36 @@ export default function ProductFilters() {
             {/* Categories */}
             <div className="mb-6">
                 <h3 className="text-sm font-semibold text-gray-900 mb-3">Категории</h3>
-
-                {loading ? (
-                    <p className="text-sm text-gray-400">Зареждане...</p>
-                ) : (
-                    <ul className="space-y-2">
-                        <li>
+                <ul className="space-y-2">
+                    <li>
+                        <button
+                            onClick={() => handleCategoryChange('')}
+                            className={`text-sm w-full text-left py-1 transition-colors ${
+                                !currentCategory
+                                    ? 'text-gray-900 font-medium'
+                                    : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                        >
+                            Всички
+                        </button>
+                    </li>
+                    {categories.map((cat) => (
+                        <li key={cat.id}>
                             <button
-                                onClick={() => handleCategoryChange('')}
-                                className={`text-sm w-full text-left py-1 ${
-                                    !searchParams.get('category')
+                                onClick={() => handleCategoryChange(cat.slug)}
+                                className={`text-sm w-full text-left py-1 transition-colors ${
+                                    currentCategory === cat.slug
                                         ? 'text-gray-900 font-medium'
                                         : 'text-gray-600 hover:text-gray-900'
                                 }`}
                             >
-                                Всички
+                                {typeof cat.name === 'string'
+                                    ? cat.name
+                                    : cat.name.bg || cat.name.en}
                             </button>
                         </li>
-                        {categories.map((cat) => (
-                            <li key={cat.id}>
-                                <button
-                                    onClick={() => handleCategoryChange(cat.slug)}
-                                    className={`text-sm w-full text-left py-1 ${
-                                        searchParams.get('category') === cat.slug
-                                            ? 'text-gray-900 font-medium'
-                                            : 'text-gray-600 hover:text-gray-900'
-                                    }`}
-                                >
-                                    {typeof cat.name === 'string'
-                                        ? cat.name
-                                        : cat.name.bg || cat.name.en}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                    ))}
+                </ul>
             </div>
 
             {/* Price Range */}
@@ -110,6 +122,7 @@ export default function ProductFilters() {
                         value={priceRange.min}
                         onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                        min="0"
                     />
                     <input
                         type="number"
@@ -117,6 +130,7 @@ export default function ProductFilters() {
                         value={priceRange.max}
                         onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                        min="0"
                     />
                 </div>
                 <button
@@ -130,13 +144,14 @@ export default function ProductFilters() {
             {/* Availability */}
             <div className="mb-6">
                 <h3 className="text-sm font-semibold text-gray-900 mb-3">Наличност</h3>
-                <label className="flex items-center gap-2">
-                    <input type="checkbox" className="rounded" />
-                    <span className="text-sm text-gray-600">В наличност</span>
-                </label>
-                <label className="flex items-center gap-2 mt-2">
-                    <input type="checkbox" className="rounded" />
-                    <span className="text-sm text-gray-600">Намаление</span>
+                <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={searchParams.get('in_stock') === '1'}
+                        onChange={(e) => handleAvailabilityChange(e.target.checked)}
+                        className="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                    />
+                    <span className="text-sm text-gray-600">Само продукти в наличност</span>
                 </label>
             </div>
         </div>

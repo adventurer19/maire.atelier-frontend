@@ -69,4 +69,15 @@ export const categoriesApi = {
         const categories = await categoriesApi.getAll();
         return categories.filter(cat => cat.show_in_menu && cat.is_active);
     },
+
+    async getCategories() {
+        const res = await apiClient.get('/categories');
+        return res.data;
+    },
+
+    async getCategoryBySlug(slug: string) {
+        const res = await apiClient.get(`/categories/${slug}`);
+        return res.data;
+    },
 };
+

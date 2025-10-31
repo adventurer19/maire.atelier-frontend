@@ -6,6 +6,18 @@ export default {
         login: 'Login',
         logout: 'Logout',
     },
+    navigation: {
+        home: 'Home',
+        products: 'Products',
+        all_products: 'All Products',
+        new_arrivals: 'New Arrivals',
+        on_sale: 'On Sale',
+        featured: 'Featured',
+        categories: 'Categories',
+        collections: 'Collections',
+        about: 'About Us',
+        contact: 'Contact',
+    },
     product: {
         in_stock: 'In stock',
         out_of_stock: 'Out of stock',
@@ -14,6 +26,6 @@ export default {
         add_to_cart: 'Add to cart',
         add_to_wishlist: 'Add to wishlist',
         categories: 'Categories',
-        low_stock: 'Only {{count}} left!'
-    }
+        low_stock: 'Only {{count}} left!',
+    },
 };

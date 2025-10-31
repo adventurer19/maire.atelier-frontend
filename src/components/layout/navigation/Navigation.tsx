@@ -6,11 +6,13 @@ import MobileMenu from './MobileMenu';
 import NavDropdown from './NavDropdown';
 import type { NavItem } from '@/types/navigation';
 import { categoriesApi } from '@/lib/api/categories';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Navigation() {
+    const { t, lang } = useLanguage();
     const [categories, setCategories] = useState<NavItem['dropdown']>([]);
 
-    // Зареждаме категориите от бекенда
+    // 🧠 Зареждаме категориите от бекенда
     useEffect(() => {
         async function loadCategories() {
             try {
@@ -19,7 +21,7 @@ export default function Navigation() {
                     name:
                         typeof cat.name === 'string'
                             ? cat.name
-                            : cat.name?.bg || cat.name?.en || 'Категория',
+                            : cat.name?.[lang] || 'Category',
                     href: `/products?category=${cat.slug}`,
                 }));
                 setCategories(formatted);
@@ -29,29 +31,29 @@ export default function Navigation() {
         }
 
         loadCategories();
-    }, []);
+    }, [lang]);
 
-    // Статични нав елементи
+    // 🧩 Навигационни елементи с преводи
     const navItems: NavItem[] = [
-        { name: 'Начало', href: '/' },
+        { name: t('navigation.home'), href: '/' },
         {
-            name: 'Продукти',
+            name: t('navigation.products'),
             href: '/products',
             dropdown: [
-                { name: 'Всички продукти', href: '/products' },
-                { name: 'Нови постъпления', href: '/products?sort=new' },
-                { name: 'Намаления', href: '/products?sale=true' },
-                { name: 'Бестселъри', href: '/products?featured=true' },
+                { name: t('navigation.all_products'), href: '/products' },
+                { name: t('navigation.new_arrivals'), href: '/products?sort=new' },
+                { name: t('navigation.on_sale'), href: '/products?sale=true' },
+                { name: t('navigation.featured'), href: '/products?featured=true' },
             ],
         },
         {
-            name: 'Категории',
+            name: t('navigation.categories'),
             href: '/categories',
-            dropdown: categories.length > 0 ? categories : undefined, // динамични категории
+            dropdown: categories.length > 0 ? categories : undefined,
         },
-        { name: 'Колекции', href: '/collections' },
-        { name: 'За нас', href: '/about' },
-        { name: 'Контакти', href: '/contact' },
+        { name: t('navigation.collections'), href: '/collections' },
+        { name: t('navigation.about'), href: '/about' },
+        { name: t('navigation.contact'), href: '/contact' },
     ];
 
     return (

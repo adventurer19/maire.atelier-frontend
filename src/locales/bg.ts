@@ -6,6 +6,18 @@ export default {
         login: 'Вход',
         logout: 'Изход',
     },
+    navigation: {
+        home: 'Начало',
+        products: 'Продукти',
+        all_products: 'Всички продукти',
+        new_arrivals: 'Нови постъпления',
+        on_sale: 'Намаления',
+        featured: 'Бестселъри',
+        categories: 'Категории',
+        collections: 'Колекции',
+        about: 'За нас',
+        contact: 'Контакти',
+    },
     product: {
         in_stock: 'В наличност',
         out_of_stock: 'Изчерпан',
@@ -14,6 +26,6 @@ export default {
         add_to_cart: 'Добави в количката',
         add_to_wishlist: 'Добави в любими',
         categories: 'Категории',
-        low_stock: 'Само {{count}} броя останали!'
-    }
+        low_stock: 'Само {{count}} броя останали!',
+    },
 };

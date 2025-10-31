@@ -4,6 +4,7 @@ import ProductGrid from '@/components/products/ProductGrid';
 import ProductFilters from '@/components/products/ProductFilters';
 import ProductSort from '@/components/products/ProductSort';
 import MobileFiltersButton from '@/components/products/MobileFiltersButton';
+import ActiveFilters from '@/components/products/ActiveFilters';
 import { productsApi } from '@/lib/api/products';
 import { categoriesApi } from '@/lib/api/categories';
 
@@ -13,29 +14,50 @@ export const metadata = {
 };
 
 interface ProductsPageProps {
-    searchParams: {
+    searchParams: Promise<{
         page?: string;
         category?: string;
         sort?: string;
         price_min?: string;
         price_max?: string;
         in_stock?: string;
-    };
+    }>;
 }
 
-async function getProducts(searchParams: ProductsPageProps['searchParams']) {
+async function getProducts(searchParams: Awaited<ProductsPageProps['searchParams']>) {
     const page = Number(searchParams.page) || 1;
     const category = searchParams.category;
     const sort = searchParams.sort || 'newest';
+    const priceMin = searchParams.price_min ? Number(searchParams.price_min) : undefined;
+    const priceMax = searchParams.price_max ? Number(searchParams.price_max) : undefined;
+    const inStock = searchParams.in_stock === '1';
 
     try {
-        const { data, meta } = await productsApi.getProducts({
+        const params: any = {
             page,
             per_page: 12,
             sort,
-            // If category slug is provided, we need to convert it to ID
-            // For now, we'll handle this differently - by filtering client-side or adjusting API
-        });
+        };
+
+        // Add category filter if provided
+        if (category) {
+            params.category = category;
+        }
+
+        // Add price filters if provided
+        if (priceMin !== undefined) {
+            params.price_min = priceMin;
+        }
+        if (priceMax !== undefined) {
+            params.price_max = priceMax;
+        }
+
+        // Add stock filter if checked
+        if (inStock) {
+            params.in_stock = 1;
+        }
+
+        const { data, meta } = await productsApi.getProducts(params);
 
         return { products: data, meta };
     } catch (error) {
@@ -58,12 +80,15 @@ async function getCategories() {
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+    // Await searchParams before using it
+    const params = await searchParams;
+
     const [{ products, meta }, categories] = await Promise.all([
-        getProducts(searchParams),
+        getProducts(params),
         getCategories(),
     ]);
 
-    const currentCategory = searchParams.category;
+    const currentCategory = params.category;
     const totalProducts = meta?.total || products.length;
 
     return (
@@ -95,21 +120,28 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     {/* Main Content */}
                     <div className="flex-1">
                         {/* Toolbar */}
-                        <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-lg shadow-sm">
-                            {/* Mobile Filters Button */}
-                            <MobileFiltersButton
-                                categories={categories}
-                                currentCategory={currentCategory}
-                            />
-
-                            {/* Results Count */}
-                            <div className="hidden sm:block text-sm text-gray-600">
-                                Показани {products.length} от {totalProducts}
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 bg-white p-4 rounded-lg shadow-sm gap-4">
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                                {/* Mobile Filters Button */}
+                                <MobileFiltersButton
+                                    categories={categories}
+                                    currentCategory={currentCategory}
+                                />
                             </div>
 
-                            {/* Sort Dropdown */}
-                            <ProductSort currentSort={searchParams.sort} />
+                            <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
+                                {/* Results Count */}
+                                <div className="text-sm text-gray-600">
+                                    Показани {products.length} от {totalProducts}
+                                </div>
+
+                                {/* Sort Dropdown */}
+                                <ProductSort currentSort={params.sort} />
+                            </div>
                         </div>
+
+                        {/* Active Filters */}
+                        <ActiveFilters categories={categories} />
 
                         {/* Products Grid */}
                         <Suspense fallback={<ProductsGridSkeleton />}>

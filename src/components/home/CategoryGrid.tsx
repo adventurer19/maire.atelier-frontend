@@ -15,7 +15,7 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
     };
 
     const getCategoryImage = (category: Category): string => {
-        return category.image || `/categories/${category.slug}.jpg`;
+        return category.image || '/placeholder-category.svg';
     };
 
     if (!categories || categories.length === 0) {
@@ -64,7 +64,8 @@ function CategoryCard({ category, name, image }: CategoryCardProps) {
                 className="object-cover group-hover:scale-110 transition-transform duration-500"
                 onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = '/placeholder-category.jpg';
+                    // ✅ Fallback към SVG
+                    target.src = '/placeholder-category.svg';
                 }}
             />
 

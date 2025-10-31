@@ -20,6 +20,8 @@ interface ProductsResponse {
     meta?: PaginationMeta;
 }
 
+const productsCache = new Map<string, any>();
+
 /**
  * Products API module for Laravel
  * Normalizes all responses to always return:
@@ -33,6 +35,10 @@ export const productsApi = {
      * Fetch all products with pagination & filters
      */
     getProducts: async (params?: ProductsParams): Promise<ProductsResponse> => {
+        const cacheKey = JSON.stringify(params || {});
+        if (productsCache.has(cacheKey)) {
+            return productsCache.get(cacheKey);
+        }
         try {
             // Build query params
             const queryParams: Record<string, any> = {};
@@ -58,9 +64,15 @@ export const productsApi = {
                 total: data.length,
             };
 
-            return { data, meta };
-        } catch (error) {
-            console.error("❌ Error fetching products:", error);
+            const result = { data, meta };
+            productsCache.set(cacheKey, result);
+            return result;
+        } catch (error: any) {
+            if (error.response?.status === 429) {
+                console.error("⚠️ Too many requests - throttled by Laravel (429)");
+            } else {
+                console.error("❌ Error fetching products:", error);
+            }
             return {
                 data: [],
                 meta: {

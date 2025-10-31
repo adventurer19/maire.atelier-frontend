@@ -1,9 +1,7 @@
-// src/app/(shop)/page.tsx
 import HeroSection from '@/components/home/HeroSection';
 import FeaturedProducts from '@/components/home/FeaturedProducts';
 import CategoryGrid from '@/components/home/CategoryGrid';
 import Newsletter from '@/components/home/Newsletter';
-import { categoriesApi } from '@/lib/api/categories';
 
 export const metadata = {
     title: 'MAIRE ATELIER - Modern Fashion',
@@ -16,10 +14,15 @@ export const metadata = {
 async function getFeaturedProducts() {
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/featured`, {
-            next: { revalidate: 60 }, // Cache for 60 seconds
+            next: { revalidate: 60 },
+            cache: 'force-cache',
         });
 
-        if (!res.ok) throw new Error("Failed to fetch featured products");
+        if (!res.ok) {
+            console.error('Failed to fetch featured products');
+            return [];
+        }
+
         const data = await res.json();
         return data.data ?? [];
     } catch (err) {
@@ -34,15 +37,20 @@ async function getFeaturedProducts() {
 async function getFeaturedCategories() {
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
-            next: { revalidate: 300 }, // Cache for 5 minutes (categories change less often)
+            next: { revalidate: 300 },
+            cache: 'force-cache', // ✅ Кеширай резултата
         });
 
-        if (!res.ok) throw new Error("Failed to fetch categories");
-        const data = await res.json();
+        if (!res.ok) {
+            console.error('Failed to fetch categories');
+            return [];
+        }
 
-        // Filter only featured categories
+        const data = await res.json();
         const categories = data.data ?? [];
-        return categories.filter((cat: any) => cat.is_featured);
+
+        // ✅ Филтрирай само featured
+        return categories.filter((cat: any) => cat.is_featured === true);
     } catch (err) {
         console.error("❌ Error fetching categories:", err);
         return [];
@@ -50,7 +58,7 @@ async function getFeaturedCategories() {
 }
 
 export default async function HomePage() {
-    // Fetch data in parallel for better performance
+    // Fetch data in parallel
     const [featuredProducts, featuredCategories] = await Promise.all([
         getFeaturedProducts(),
         getFeaturedCategories(),
@@ -69,7 +77,7 @@ export default async function HomePage() {
                             Избрани Продукти
                         </h2>
                         <p className="text-gray-600 max-w-2xl mx-auto">
-                            Открийте нашата селекция от уникални модни парчета
+                            Открийте най-новите и ексклузивни артикули от нашата колекция
                         </p>
                     </div>
 
@@ -81,25 +89,23 @@ export default async function HomePage() {
                 </div>
             </section>
 
-            {/* Categories */}
-            <section className="py-16 bg-gray-50">
-                <div className="container">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-serif font-bold text-gray-900 mb-4">
-                            Категории
-                        </h2>
-                        <p className="text-gray-600">Разгледайте нашите колекции</p>
-                    </div>
-
-                    {featuredCategories.length > 0 ? (
-                        <CategoryGrid categories={featuredCategories} />
-                    ) : (
-                        <div className="text-center py-12">
-                            <p className="text-gray-500">Зареждане на категории...</p>
+            {/* Categories - Показвай само ако има featured */}
+            {featuredCategories.length > 0 && (
+                <section className="py-16 bg-gray-50">
+                    <div className="container">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-serif font-bold text-gray-900 mb-4">
+                                Категории
+                            </h2>
+                            <p className="text-gray-600">
+                                Разгледайте нашите колекции по категории
+                            </p>
                         </div>
-                    )}
-                </div>
-            </section>
+
+                        <CategoryGrid categories={featuredCategories} />
+                    </div>
+                </section>
+            )}
 
             {/* Newsletter */}
             <Newsletter />
