@@ -1,12 +1,17 @@
 // src/components/layout/footer/Footer.tsx
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/ui/Logo';
 import { useLanguage } from '@/context/LanguageContext';
+import { newsletterApi } from '@/lib/api/newsletter';
 
 export default function Footer() {
     const { t } = useLanguage();
+    const [email, setEmail] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     return (
         <footer className="bg-[#0E0E11] text-[#EAEAEA] pt-12 pb-10 border-t border-b border-white border-opacity-10">
             <div className="container px-6 max-w-7xl mx-auto">
@@ -14,21 +19,89 @@ export default function Footer() {
                 <div className="max-w-4xl mx-auto mb-8 md:mb-10 lg:mb-12 text-center px-4 pt-8 md:pt-10 lg:pt-12 pb-8 md:pb-10 lg:pb-12 border-t border-b border-white border-opacity-10">
                     <h2 className="text-xl md:text-2xl font-light mb-3 md:mb-4 tracking-tight">{t('footer.newsletter_title', { default: '' }) || 'Join our newsletter'}</h2>
                     <p className="text-sm md:text-base text-[#999] mb-4 md:mb-6 max-w-lg mx-auto font-light">{t('footer.newsletter_subtitle', { default: '' }) || 'Subscribe to receive the latest updates, offers, and style inspiration.'}</p>
-                    <form className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
+                    <form 
+                        className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 max-w-md mx-auto" 
+                        onSubmit={async (e) => {
+                            e.preventDefault();
+                            if (!email.trim() || isSubmitting) return;
+
+                            // Client-side validation
+                            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                            if (!emailRegex.test(email.trim())) {
+                                setMessage({ 
+                                    type: 'error', 
+                                    text: t('newsletter.invalid_email') || 'Please enter a valid email address.' 
+                                });
+                                return;
+                            }
+
+                            if (email.trim().length > 255) {
+                                setMessage({ 
+                                    type: 'error', 
+                                    text: 'Email address is too long.' 
+                                });
+                                return;
+                            }
+
+                            setIsSubmitting(true);
+                            setMessage(null);
+
+                            try {
+                                const response = await newsletterApi.subscribe(email.trim());
+                                setMessage({ type: 'success', text: response.message });
+                                setEmail(''); // Clear input on success
+                            } catch (error: any) {
+                                setMessage({ 
+                                    type: 'error', 
+                                    text: error.message || t('newsletter.subscription_failed') || 'Failed to subscribe. Please try again.' 
+                                });
+                            } finally {
+                                setIsSubmitting(false);
+                            }
+                        }}
+                    >
+                        {/* Honeypot field - hidden from users, visible to bots */}
+                        <input
+                            type="text"
+                            name="honeypot"
+                            tabIndex={-1}
+                            autoComplete="off"
+                            style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}
+                            aria-hidden="true"
+                        />
                         <input
                             type="email"
+                            value={email}
+                            onChange={(e) => {
+                                // Sanitize input - remove dangerous characters
+                                const sanitized = e.target.value.replace(/[\r\n%0a%0d%00<>]/g, '');
+                                if (sanitized.length <= 255) {
+                                    setEmail(sanitized);
+                                }
+                            }}
                             placeholder={t('footer.email_placeholder', { default: '' }) || 'Enter your email'}
                             aria-label="Email address"
                             required
-                            className="w-full px-4 py-3 md:py-3 bg-[#1A1A1A] text-[#EAEAEA] placeholder-[#999] border border-[#333] focus:outline-none focus:ring-2 focus:ring-[#EAEAEA] text-sm md:text-base min-h-[48px] transition-all duration-300"
+                            disabled={isSubmitting}
+                            maxLength={255}
+                            autoComplete="email"
+                            className="w-full px-4 py-3 md:py-3 bg-[#1A1A1A] text-[#EAEAEA] placeholder-[#999] border border-[#333] focus:outline-none focus:ring-2 focus:ring-[#EAEAEA] text-sm md:text-base min-h-[48px] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         />
                         <button
                             type="submit"
-                            className="px-6 py-3 md:py-3 bg-[#EAEAEA] text-[#0E0E11] font-light hover:bg-[#d4d4d4] active:bg-[#c4c4c4] transition-all duration-300 text-sm md:text-base min-h-[48px] whitespace-nowrap touch-manipulation border-2 border-[#EAEAEA]"
+                            disabled={isSubmitting || !email.trim()}
+                            className="px-6 py-3 md:py-3 bg-[#EAEAEA] text-[#0E0E11] font-light hover:bg-[#d4d4d4] active:bg-[#c4c4c4] transition-all duration-300 text-sm md:text-base min-h-[48px] whitespace-nowrap touch-manipulation border-2 border-[#EAEAEA] disabled:pointer-events-none disabled:cursor-not-allowed"
                         >
-                            {t('footer.subscribe') || 'Subscribe'}
+                            {isSubmitting ? (t('newsletter.subscribing') || 'Subscribing...') : (t('footer.subscribe') || 'Subscribe')}
                         </button>
                     </form>
+                    {message && (
+                        <div className={`mt-4 text-sm font-light text-center ${
+                            message.type === 'success' ? 'text-green-400' : 'text-red-400'
+                        }`}>
+                            {message.text}
+                        </div>
+                    )}
                 </div>
 
                 {/* Main Footer Grid */}

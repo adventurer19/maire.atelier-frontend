@@ -14,7 +14,16 @@ interface ProductInfoProps {
 export default function ProductInfo({ product }: ProductInfoProps) {
     const { t, lang } = useLanguage();
     const router = useRouter();
-    const [selectedVariant, setSelectedVariant] = useState(product.variants[0]?.id || null);
+    
+    // Find the first available variant (active and in stock)
+    const getFirstAvailableVariant = () => {
+        const availableVariant = product.variants?.find(
+            (variant) => variant.is_active && variant.is_in_stock
+        );
+        return availableVariant?.id || null;
+    };
+    
+    const [selectedVariant, setSelectedVariant] = useState(getFirstAvailableVariant());
     const [quantity, setQuantity] = useState(1);
     const { products: wishlistItems } = useWishlist();
     const toggleWishlist = useToggleWishlist();

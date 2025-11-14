@@ -53,53 +53,55 @@ export default function ActiveFilters({ categories }: ActiveFiltersProps) {
     };
 
     return (
-        <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="text-sm text-gray-600">{t('filters.active') || 'Активни филтри:'}</span>
+        <div className="mb-5">
+            <div className="flex flex-wrap items-center gap-2.5 bg-gray-50 rounded-xl border border-gray-100 px-4 py-3">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide mr-1">{t('filters.active') || 'Активни филтри'}</span>
 
-            {category && (
-                <button
-                    onClick={() => removeFilter('category')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white rounded-full text-sm hover:bg-gray-800 transition-colors"
-                >
-                    <span>{getCategoryName(category)}</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            )}
+                {category && (
+                    <button
+                        onClick={() => removeFilter('category')}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-100 active:bg-gray-200 transition-all duration-200 border border-gray-200 shadow-sm"
+                    >
+                        <span>{getCategoryName(category)}</span>
+                        <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                )}
 
-            {(priceMin || priceMax) && (
-                <button
-                    onClick={removePriceFilter}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white rounded-full text-sm hover:bg-gray-800 transition-colors"
-                >
-                    <span>{t('filters.price') || 'Цена'}: {priceMin || '0'} - {priceMax || '∞'}</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            )}
+                {(priceMin || priceMax) && (
+                    <button
+                        onClick={removePriceFilter}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-100 active:bg-gray-200 transition-all duration-200 border border-gray-200 shadow-sm"
+                    >
+                        <span>{t('filters.price') || 'Цена'}: {priceMin || '0'} - {priceMax || '∞'}</span>
+                        <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                )}
 
-            {inStock === '1' && (
-                <button
-                    onClick={() => removeFilter('in_stock')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white rounded-full text-sm hover:bg-gray-800 transition-colors"
-                >
-                    <span>{t('filters.only_in_stock') || 'В наличност'}</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            )}
+                {inStock === '1' && (
+                    <button
+                        onClick={() => removeFilter('in_stock')}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-100 active:bg-gray-200 transition-all duration-200 border border-gray-200 shadow-sm"
+                    >
+                        <span>{t('filters.only_in_stock') || 'В наличност'}</span>
+                        <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                )}
 
-            {hasFilters && (
-                <button
-                    onClick={clearAllFilters}
-                    className="text-sm text-gray-600 hover:text-gray-900 underline ml-2 transition-colors"
-                >
-                    {t('filters.clear_all') || 'Изчисти всички'}
-                </button>
-            )}
+                {hasFilters && (
+                    <button
+                        onClick={clearAllFilters}
+                        className="ml-auto text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors px-2 py-1 rounded-md hover:bg-white active:bg-gray-50"
+                    >
+                        {t('filters.clear_all') || 'Изчисти всички'}
+                    </button>
+                )}
+            </div>
         </div>
     );
 }

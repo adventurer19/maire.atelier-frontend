@@ -127,24 +127,20 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     {/* Main Content */}
                     <div className="flex-1 min-w-0">
                         {/* Toolbar */}
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 bg-white border border-gray-200 shadow-sm p-3 md:p-4 gap-3 md:gap-4">
-                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="mb-4 md:mb-6">
+                            <div className="flex items-center gap-3 bg-white rounded-xl border border-gray-100 shadow-sm p-4 md:p-5">
                                 {/* Mobile Filters Button */}
-                                <MobileFiltersButton
-                                    categories={categories}
-                                    currentCategory={currentCategory}
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
-                                {/* Results Count */}
-                                <div className="text-sm text-gray-600">
-                                    {/* client-only text replaced in toolbar count if needed later */}
-                                    
+                                <div className="flex-shrink-0">
+                                    <MobileFiltersButton
+                                        categories={categories}
+                                        currentCategory={currentCategory}
+                                    />
                                 </div>
 
                                 {/* Sort Dropdown */}
-                                <ProductSort />
+                                <div className="flex-1 flex justify-end">
+                                    <ProductSort />
+                                </div>
                             </div>
                         </div>
 

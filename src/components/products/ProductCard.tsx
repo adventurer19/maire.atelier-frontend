@@ -13,6 +13,9 @@ export default function ProductCard({ product }: { product: Product }) {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
     const [loadedImages, setLoadedImages] = useState<string[]>([]);
+    const [touchStart, setTouchStart] = useState(0);
+    const [touchEnd, setTouchEnd] = useState(0);
+    const [isSwiping, setIsSwiping] = useState(false);
     
     // Get product name with language support
     const productName =
@@ -20,46 +23,90 @@ export default function ProductCard({ product }: { product: Product }) {
             ? product.name
             : product.name?.[lang] || product.name?.bg || product.name?.en || 'Product';
 
-    // Get all valid image URLs (primary_image first, then images array, then thumbnail as fallback)
+    // Get all valid image URLs
+    // IMPORTANT: Use images array as the single source of truth
+    // primary_image is just a reference to one of the images in the array, not a separate image
     const allImages = useMemo(() => {
-        const images: string[] = [];
-        const seen = new Set<string>();
+        // Helper to normalize URL for comparison
+        const normalizeUrl = (url: string): string => {
+            return url.trim().replace(/\/$/, '').split('?')[0].toLowerCase();
+        };
         
-        // Helper to add image if valid and not seen
-        const addImage = (img: string | null | undefined) => {
-            if (!img || 
-                img.trim() === '' || 
-                img.includes('placeholder') ||
-                img === 'null' ||
-                seen.has(img)) {
-                return false;
-            }
-            images.push(img);
-            seen.add(img);
-            return true;
+        // Helper to check if image is valid
+        const isValidImage = (img: string | null | undefined): boolean => {
+            return !!img && 
+                img.trim() !== '' && 
+                !img.includes('placeholder') &&
+                img !== 'null';
         };
 
-        // Add primary_image first (highest priority)
-        addImage(product.primary_image);
+        // Step 1: Collect all unique images from images array (this is the source of truth)
+        const imagesMap = new Map<string, string>(); // normalized URL -> original URL
+        const imagesList: string[] = [];
         
-        // Add all images from images array
         if (product.images && Array.isArray(product.images) && product.images.length > 0) {
             product.images.forEach((img) => {
-                if (typeof img === 'string') {
-                    addImage(img);
+                if (isValidImage(img) && typeof img === 'string') {
+                    const normalized = normalizeUrl(img);
+                    if (!imagesMap.has(normalized)) {
+                        imagesMap.set(normalized, img);
+                        imagesList.push(img);
+                    }
                 }
             });
         }
         
-        // Add thumbnail as fallback if no images added yet
-        if (images.length === 0) {
-            addImage(product.thumbnail);
+        // Step 2: If we have images array, use it as the source
+        if (imagesList.length > 0) {
+            // Find which image in the array matches primary_image (if any)
+            let primaryImageIndex = -1;
+            if (product.primary_image && isValidImage(product.primary_image)) {
+                const normalizedPrimary = normalizeUrl(product.primary_image);
+                primaryImageIndex = imagesList.findIndex(img => normalizeUrl(img) === normalizedPrimary);
+            }
+            
+            // Reorder: put primary_image first if it exists in the array
+            if (primaryImageIndex >= 0) {
+                const reordered = [imagesList[primaryImageIndex], ...imagesList.filter((_, i) => i !== primaryImageIndex)];
+                return reordered;
+            }
+            
+            // primary_image not in array, return images as-is
+            return imagesList;
         }
         
-        return images;
+        // Step 3: No images array - use primary_image or thumbnail as fallback
+        const fallbackImages: string[] = [];
+        if (isValidImage(product.primary_image)) {
+            fallbackImages.push(product.primary_image);
+        }
+        if (fallbackImages.length === 0 && isValidImage(product.thumbnail)) {
+            fallbackImages.push(product.thumbnail);
+        }
+        
+        return fallbackImages;
     }, [product.primary_image, product.images, product.thumbnail]);
 
     const hasMultipleImages = allImages.length > 1;
+    
+    // Ensure currentImageIndex is always 0 if there's only one image
+    useEffect(() => {
+        if (!hasMultipleImages && currentImageIndex !== 0) {
+            setCurrentImageIndex(0);
+        }
+    }, [hasMultipleImages, currentImageIndex]);
+    
+    // Ensure currentImageIndex doesn't exceed array bounds
+    useEffect(() => {
+        if (allImages.length > 0 && currentImageIndex >= allImages.length) {
+            setCurrentImageIndex(0);
+        }
+        // Also ensure index is never negative
+        if (currentImageIndex < 0) {
+            setCurrentImageIndex(0);
+        }
+    }, [currentImageIndex, allImages.length]);
+    
     const currentImageUrl = allImages[currentImageIndex] || allImages[0] || null;
     const hasValidImage = currentImageUrl && !imageError;
     
@@ -69,16 +116,75 @@ export default function ProductCard({ product }: { product: Product }) {
         ? !isCurrentImageLoaded && imageLoading[currentImageUrl] !== false
         : false;
 
-    // Auto-rotate images every 2 seconds ONLY when hovered
+    // Auto-rotate images every 2 seconds ONLY when hovered (desktop only)
     useEffect(() => {
         if (!hasMultipleImages || !isHovered) return;
-
-        const interval = setInterval(() => {
-            setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
-        }, 2000);
-
-        return () => clearInterval(interval);
+        // Only auto-rotate on desktop (not on touch devices)
+        if (window.matchMedia('(pointer: fine)').matches) {
+            const interval = setInterval(() => {
+                setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+            }, 2000);
+            return () => clearInterval(interval);
+        }
     }, [hasMultipleImages, isHovered, allImages.length]);
+
+    // Touch handlers for mobile swipe
+    const minSwipeDistance = 50;
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        // Only allow swipe if there are multiple images
+        if (!hasMultipleImages || allImages.length <= 1) {
+            setIsSwiping(false);
+            return;
+        }
+        setIsSwiping(true);
+        setTouchEnd(0);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        // Only track movement if we're actually swiping and there are multiple images
+        if (!isSwiping || !hasMultipleImages || allImages.length <= 1) return;
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        // Prevent link navigation if we just swiped
+        if (isSwiping) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // Only process swipe if there are multiple images
+        if (!hasMultipleImages || allImages.length <= 1 || !isSwiping) {
+            setTouchStart(0);
+            setTouchEnd(0);
+            setIsSwiping(false);
+            return;
+        }
+        
+        if (!touchStart || !touchEnd) {
+            setTouchStart(0);
+            setTouchEnd(0);
+            setIsSwiping(false);
+            return;
+        }
+        
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe && allImages.length > 1) {
+            setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+        } else if (isRightSwipe && allImages.length > 1) {
+            setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+        }
+        
+        // Reset touch state
+        setTouchStart(0);
+        setTouchEnd(0);
+        setIsSwiping(false);
+    };
 
     // Preload next image for smoother transitions
     useEffect(() => {
@@ -139,7 +245,12 @@ export default function ProductCard({ product }: { product: Product }) {
         >
             <article className="relative flex flex-col h-full">
                 {/* Product Image Container - Sharp, Clean Design */}
-                <div className="relative aspect-[3/4] bg-gray-50 overflow-hidden mb-4 md:mb-5">
+                <div 
+                    className={`relative aspect-[3/4] bg-gray-50 overflow-hidden mb-4 md:mb-5 ${hasMultipleImages ? 'touch-pan-y' : ''}`}
+                    onTouchStart={hasMultipleImages ? handleTouchStart : undefined}
+                    onTouchMove={hasMultipleImages ? handleTouchMove : undefined}
+                    onTouchEnd={hasMultipleImages ? handleTouchEnd : undefined}
+                >
                     {hasValidImage ? (
                         <>
                             {/* Loading Skeleton */}
@@ -195,7 +306,7 @@ export default function ProductCard({ product }: { product: Product }) {
                                 />
                             )}
 
-                            {/* Navigation Arrows - Sharp, Clean Design (same as ProductCarousel) */}
+                            {/* Navigation Arrows - Desktop only */}
                             {hasMultipleImages && (
                                 <>
                                     <button
@@ -221,9 +332,9 @@ export default function ProductCard({ product }: { product: Product }) {
                                 </>
                             )}
 
-                            {/* Image Indicators - Show dots if multiple images */}
+                            {/* Image Indicators - Always visible on mobile, hover on desktop */}
                             {hasMultipleImages && (
-                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
                                     {allImages.map((_, index) => (
                                         <button
                                             key={index}
@@ -232,10 +343,10 @@ export default function ProductCard({ product }: { product: Product }) {
                                                 e.stopPropagation();
                                                 goToImage(index);
                                             }}
-                                            className={`transition-all duration-300 ${
+                                            className={`transition-all duration-300 touch-manipulation ${
                                                 index === currentImageIndex
-                                                    ? 'w-6 h-0.5 bg-gray-900'
-                                                    : 'w-6 h-0.5 bg-gray-900/30 hover:bg-gray-900/50'
+                                                    ? 'w-8 h-1 bg-gray-900 rounded-full'
+                                                    : 'w-1.5 h-1.5 bg-gray-900/40 hover:bg-gray-900/60 rounded-full'
                                             }`}
                                             aria-label={`Go to image ${index + 1}`}
                                             onMouseEnter={(e) => e.stopPropagation()}

@@ -491,4 +491,13 @@ export default {
         related_posts: 'Related posts',
         back_to_blog: 'Back to blog',
     },
+    newsletter: {
+        subscribed: 'Successfully subscribed to our newsletter!',
+        already_subscribed: 'This email address is already subscribed.',
+        resubscribed: 'Successfully resubscribed!',
+        subscription_failed: 'An error occurred while subscribing. Please try again.',
+        subscribing: 'Subscribing...',
+        invalid_email: 'Please enter a valid email address.',
+        rate_limit_exceeded: 'Too many attempts. Please try again later.',
+    },
 };

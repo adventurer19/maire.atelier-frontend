@@ -241,7 +241,7 @@ function CartItemCard({
                             fill
                             sizes="(max-width: 768px) 80px, 96px"
                             className="object-cover"
-                            unoptimized={imageUrl.includes('laravel.test') || imageUrl.includes('localhost')}
+                            unoptimized={imageUrl.includes('laravel.test') || imageUrl.includes('localhost') || imageUrl.includes('maire.atelier.test')}
                             onError={() => setImageError(true)}
                         />
                     ) : (

@@ -54,19 +54,21 @@ export default function ProductSort() {
     }, [isOpen]);
 
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative w-full sm:w-auto" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-3 md:px-4 py-2 text-xs md:text-sm font-light text-gray-700 hover:text-gray-900 transition-colors touch-manipulation"
+                className="flex items-center justify-between gap-2 w-full sm:w-auto px-4 py-2.5 bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100 transition-all duration-200 text-sm font-medium text-gray-700 shadow-sm hover:shadow-md touch-manipulation min-h-[44px]"
             >
-                <span className="text-gray-600">{t('filters.sort_by') || 'Подреди по:'}</span>
-                <span className="text-gray-900 font-light">{currentLabel}</span>
+                <div className="flex items-center gap-2">
+                    <span className="text-gray-500 text-xs font-normal">{t('filters.sort_by') || 'Подреди по:'}</span>
+                    <span className="text-gray-900 font-medium">{currentLabel}</span>
+                </div>
                 <svg
-                    className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    strokeWidth={1.5}
+                    strokeWidth={2}
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
@@ -74,28 +76,36 @@ export default function ProductSort() {
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute right-0 top-full mt-1 w-56 bg-white border border-gray-200 shadow-lg z-50">
-                    <ul className="py-2">
-                        {sortOptions.map((option) => {
-                            const label = option.label[lang] || option.label.bg;
-                            const isActive = option.value === currentSort;
-                            return (
-                                <li key={option.value}>
-                                    <button
-                                        onClick={() => handleSort(option.value)}
-                                        className={`w-full text-left px-4 py-2.5 text-sm font-light transition-colors ${
-                                            isActive
-                                                ? 'bg-gray-50 text-gray-900 font-medium'
-                                                : 'text-gray-700 hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        {label}
-                                    </button>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </div>
+                <>
+                    {/* Backdrop for mobile */}
+                    <div
+                        className="fixed inset-0 bg-black/20 z-40 sm:hidden"
+                        onClick={() => setIsOpen(false)}
+                        aria-hidden="true"
+                    />
+                    <div className="absolute right-0 top-full mt-2 min-w-[200px] w-[calc(100vw-3.5rem)] sm:w-56 max-w-[calc(100vw-2rem)] sm:max-w-none bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                        <ul className="py-1.5">
+                            {sortOptions.map((option) => {
+                                const label = option.label[lang] || option.label.bg;
+                                const isActive = option.value === currentSort;
+                                return (
+                                    <li key={option.value}>
+                                        <button
+                                            onClick={() => handleSort(option.value)}
+                                            className={`w-full text-left px-4 py-2.5 text-sm transition-all duration-150 ${
+                                                isActive
+                                                    ? 'bg-gray-100 text-gray-900 font-semibold'
+                                                    : 'text-gray-700 hover:bg-gray-50 font-medium'
+                                            }`}
+                                        >
+                                            {label}
+                                        </button>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                </>
             )}
         </div>
     );

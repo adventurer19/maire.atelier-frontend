@@ -102,7 +102,7 @@ export default function Header() {
                         {/* Wishlist */}
                         <Link
                             href="/wishlist"
-                            className="hidden sm:flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
+                            className="flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors touch-manipulation"
                             aria-label="Wishlist"
                         >
                             <HeartIcon />
