@@ -11,7 +11,7 @@ export default function ProductCard({ product }: { product: Product }) {
     const [imageError, setImageError] = useState(false);
     const [imageLoading, setImageLoading] = useState<Record<string, boolean>>({});
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [isPaused, setIsPaused] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
     const [loadedImages, setLoadedImages] = useState<string[]>([]);
     
     // Get product name with language support
@@ -69,16 +69,16 @@ export default function ProductCard({ product }: { product: Product }) {
         ? !isCurrentImageLoaded && imageLoading[currentImageUrl] !== false
         : false;
 
-    // Auto-rotate images every 2 seconds if multiple images
+    // Auto-rotate images every 2 seconds ONLY when hovered
     useEffect(() => {
-        if (!hasMultipleImages || isPaused) return;
+        if (!hasMultipleImages || !isHovered) return;
 
         const interval = setInterval(() => {
             setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
         }, 2000);
 
         return () => clearInterval(interval);
-    }, [hasMultipleImages, isPaused, allImages.length]);
+    }, [hasMultipleImages, isHovered, allImages.length]);
 
     // Preload next image for smoother transitions
     useEffect(() => {
@@ -131,8 +131,11 @@ export default function ProductCard({ product }: { product: Product }) {
         <Link
             href={`/products/${product.slug}`}
             className="group relative flex flex-col h-full"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => {
+                setIsHovered(false);
+                setCurrentImageIndex(0); // Reset to first image when leaving
+            }}
         >
             <article className="relative flex flex-col h-full">
                 {/* Product Image Container - Sharp, Clean Design */}

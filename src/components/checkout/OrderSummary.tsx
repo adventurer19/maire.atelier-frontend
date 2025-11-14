@@ -21,6 +21,7 @@ export default function OrderSummary({ cart }: OrderSummaryProps) {
                                 src={item.product?.primary_image || '/placeholder-category.svg'}
                                 alt={item.product?.name || 'Product'}
                                 fill
+                                sizes="80px"
                                 className="object-cover rounded"
                             />
                         </div>

@@ -2,11 +2,9 @@
 'use client';
 
 import { useState } from 'react';
-import { siteData } from '@/data/siteData'
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function ContactPage() {
-    const { contact } = siteData;
     const { t } = useLanguage();
     const [formData, setFormData] = useState({
         name: '',
@@ -37,11 +35,11 @@ export default function ContactPage() {
             <section className="bg-gray-900 text-white py-16">
                 <div className="container text-center">
                     <h1 className="text-5xl font-serif font-bold mb-4">
-                        {contact.hero.title}
+                        {t('contact.hero_title')}
                     </h1>
-                    <p className="text-xl mb-2">{contact.hero.subtitle}</p>
+                    <p className="text-xl mb-2">{t('contact.hero_subtitle')}</p>
                     <p className="text-gray-300 max-w-2xl mx-auto">
-                        {contact.hero.description}
+                        {t('contact.hero_description')}
                     </p>
                 </div>
             </section>
@@ -127,8 +125,8 @@ export default function ContactPage() {
                                     <EmailIcon className="w-5 h-5 text-gray-600 mt-1" />
                                     <div>
                                         <div className="font-medium">Email</div>
-                                        <a href={`mailto:${contact.info.email}`} className="text-gray-600 hover:text-gray-900">
-                                            {contact.info.email}
+                                        <a href="mailto:info@maire-atelier.com" className="text-gray-600 hover:text-gray-900">
+                                            info@maire-atelier.com
                                         </a>
                                     </div>
                                 </div>
@@ -137,8 +135,8 @@ export default function ContactPage() {
                                     <PhoneIcon className="w-5 h-5 text-gray-600 mt-1" />
                                     <div>
                                         <div className="font-medium">{t('contact.phone')}</div>
-                                        <a href={`tel:${contact.info.phone}`} className="text-gray-600 hover:text-gray-900">
-                                            {contact.info.phone}
+                                        <a href="tel:+359888123456" className="text-gray-600 hover:text-gray-900">
+                                            +359 888 123 456
                                         </a>
                                     </div>
                                 </div>
@@ -148,9 +146,9 @@ export default function ContactPage() {
                                     <div>
                                         <div className="font-medium">{t('contact.address')}</div>
                                         <div className="text-gray-600">
-                                            {contact.info.address.street}<br />
-                                            {contact.info.address.city}, {contact.info.address.zip}<br />
-                                            {contact.info.address.country}
+                                            ул. Витоша 15<br />
+                                            София, 1000<br />
+                                            България
                                         </div>
                                     </div>
                                 </div>
@@ -161,9 +159,9 @@ export default function ContactPage() {
                         <div className="bg-white rounded-lg p-8 shadow-sm">
                             <h3 className="text-xl font-bold mb-6">{t('contact.working_hours')}</h3>
                             <div className="space-y-2 text-gray-600">
-                                <div>{contact.info.workingHours.weekdays}</div>
-                                <div>{contact.info.workingHours.saturday}</div>
-                                <div>{contact.info.workingHours.sunday}</div>
+                                <div>{t('contact.working_hours_weekdays')}</div>
+                                <div>{t('contact.working_hours_saturday')}</div>
+                                <div>{t('contact.working_hours_sunday')}</div>
                             </div>
                         </div>
 
@@ -171,17 +169,33 @@ export default function ContactPage() {
                         <div className="bg-white rounded-lg p-8 shadow-sm">
                             <h3 className="text-xl font-bold mb-6">{t('contact.follow_us')}</h3>
                             <div className="flex gap-4">
-                                {contact.social.map((social) => (
-                                    <a
-                                        key={social.name}
-                                        href={social.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-                                    >
-                                        {social.name[0]}
-                                    </a>
-                                ))}
+                                <a
+                                    href="https://instagram.com/maire.atelier"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                                    aria-label="Instagram"
+                                >
+                                    I
+                                </a>
+                                <a
+                                    href="https://facebook.com/maire.atelier"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                                    aria-label="Facebook"
+                                >
+                                    F
+                                </a>
+                                <a
+                                    href="https://pinterest.com/maire.atelier"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                                    aria-label="Pinterest"
+                                >
+                                    P
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -191,12 +205,22 @@ export default function ContactPage() {
                 <div className="mt-16 bg-white rounded-lg p-8 shadow-sm">
                     <h2 className="text-2xl font-bold mb-8 text-center">{t('contact.faq_title')}</h2>
                     <div className="grid md:grid-cols-2 gap-8">
-                        {contact.faq.map((item, index) => (
-                            <div key={index}>
-                                <h3 className="font-bold mb-2">{item.question}</h3>
-                                <p className="text-gray-600">{item.answer}</p>
-                            </div>
-                        ))}
+                        <div>
+                            <h3 className="font-bold mb-2">{t('contact.faq_order_question')}</h3>
+                            <p className="text-gray-600">{t('contact.faq_order_answer')}</p>
+                        </div>
+                        <div>
+                            <h3 className="font-bold mb-2">{t('contact.faq_delivery_question')}</h3>
+                            <p className="text-gray-600">{t('contact.faq_delivery_answer')}</p>
+                        </div>
+                        <div>
+                            <h3 className="font-bold mb-2">{t('contact.faq_return_question')}</h3>
+                            <p className="text-gray-600">{t('contact.faq_return_answer')}</p>
+                        </div>
+                        <div>
+                            <h3 className="font-bold mb-2">{t('contact.faq_personalization_question')}</h3>
+                            <p className="text-gray-600">{t('contact.faq_personalization_answer')}</p>
+                        </div>
                     </div>
                 </div>
             </div>

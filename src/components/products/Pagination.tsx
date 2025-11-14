@@ -40,7 +40,7 @@ export default function Pagination({ pagination }: PaginationProps) {
             {current_page > 1 && (
                 <Link
                     href={createPageUrl(current_page - 1)}
-                    className="px-3 md:px-4 py-2 border-2 border-gray-300 rounded-lg text-xs md:text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors min-h-[44px] md:min-h-[auto] flex items-center justify-center touch-manipulation"
+                    className="px-4 py-2.5 md:py-2 bg-gray-900 text-white text-xs md:text-sm font-light hover:bg-gray-800 active:bg-gray-700 transition-all duration-300 min-h-[44px] md:min-h-[auto] flex items-center justify-center touch-manipulation border-2 border-gray-900"
                 >
                     ← {t('common.previous')}
                 </Link>
@@ -62,10 +62,10 @@ export default function Pagination({ pagination }: PaginationProps) {
                         <Link
                             key={page}
                             href={createPageUrl(page as number)}
-                            className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors min-h-[44px] md:min-h-[auto] flex items-center justify-center touch-manipulation ${
+                            className={`px-3 md:px-4 py-2 text-xs md:text-sm font-light transition-all duration-300 min-h-[44px] md:min-h-[auto] flex items-center justify-center touch-manipulation ${
                                 isActive
-                                    ? 'bg-gray-900 text-white'
-                                    : 'border-2 border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                                    ? 'bg-gray-900 text-white border-2 border-gray-900'
+                                    : 'border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100'
                             }`}
                         >
                             {page}
@@ -78,7 +78,7 @@ export default function Pagination({ pagination }: PaginationProps) {
             {current_page < last_page && (
                 <Link
                     href={createPageUrl(current_page + 1)}
-                    className="px-3 md:px-4 py-2 border-2 border-gray-300 rounded-lg text-xs md:text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors min-h-[44px] md:min-h-[auto] flex items-center justify-center touch-manipulation"
+                    className="px-4 py-2.5 md:py-2 bg-gray-900 text-white text-xs md:text-sm font-light hover:bg-gray-800 active:bg-gray-700 transition-all duration-300 min-h-[44px] md:min-h-[auto] flex items-center justify-center touch-manipulation border-2 border-gray-900"
                 >
                     {t('common.next')} →
                 </Link>

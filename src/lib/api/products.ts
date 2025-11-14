@@ -1,6 +1,7 @@
 // src/lib/api/products.ts
 import { apiClient } from "./client";
 import type { Product, PaginationMeta } from "@/types";
+import { getCurrentLang } from "@/lib/getCurrentLang";
 
 interface ProductsParams {
     page?: number;
@@ -83,8 +84,12 @@ export const productsApi = {
      * Fetch all products with pagination & filters
      */
     getProducts: async (params?: ProductsParams): Promise<ProductsResponse> => {
+        // Get current language for cache key (to invalidate cache when language changes)
+        const currentLang = getCurrentLang();
+        
         // Normalize params for cache key - ensure consistent ordering
         const normalizedParams = params ? {
+            lang: currentLang, // Include language in cache key
             page: params.page,
             per_page: params.per_page,
             sort: params.sort,
@@ -95,7 +100,7 @@ export const productsApi = {
             price_max: params.price_max,
             in_stock: params.in_stock,
             on_sale: params.on_sale,
-        } : {};
+        } : { lang: currentLang };
         
         // Remove undefined values for consistent cache keys
         Object.keys(normalizedParams).forEach(key => {
@@ -231,7 +236,9 @@ export const productsApi = {
      * Fetch a single product by slug
      */
     getProduct: async (slug: string): Promise<Product | null> => {
-        const cacheKey = `product:${slug}`;
+        // Get current language for cache key
+        const currentLang = getCurrentLang();
+        const cacheKey = `product:${slug}:${currentLang}`;
         const cached = getCached(cacheKey) ?? getPersistent(cacheKey);
         if (cached) return cached;
         try {
@@ -264,7 +271,9 @@ export const productsApi = {
      * Fetch featured products
      */
     getFeatured: async (limit: number = 8): Promise<Product[]> => {
-        const cacheKey = `featured:${limit}`;
+        // Get current language for cache key
+        const currentLang = getCurrentLang();
+        const cacheKey = `featured:${limit}:${currentLang}`;
         const cached = getCached(cacheKey) ?? getPersistent(cacheKey);
         if (cached) return cached;
         try {
@@ -300,7 +309,9 @@ export const productsApi = {
         query: string,
         params?: Omit<ProductsParams, 'search'>
     ): Promise<ProductsResponse> => {
-        const cacheKey = `search:${query}:${JSON.stringify(params || {})}`;
+        // Get current language for cache key
+        const currentLang = getCurrentLang();
+        const cacheKey = `search:${query}:${currentLang}:${JSON.stringify(params || {})}`;
         const cached = getCached(cacheKey) ?? getPersistent(cacheKey);
         if (cached) return cached;
         try {

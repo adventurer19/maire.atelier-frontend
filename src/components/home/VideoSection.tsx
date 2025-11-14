@@ -34,7 +34,7 @@ export default function VideoSection() {
 
             // Fallback timeout - hide loading after 5 seconds
             const timeout = setTimeout(() => {
-                console.warn('Video loading timeout - hiding spinner');
+                // Silently hide spinner if video takes too long to load
                 setIsLoading(false);
             }, 5000);
 

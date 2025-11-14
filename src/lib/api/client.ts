@@ -21,21 +21,44 @@ export const apiClient = axios.create({
 /**
  * Request interceptor:
  * Adds tokens and language settings to each request
+ * Works both client-side (from localStorage) and server-side (from cookies)
  */
 apiClient.interceptors.request.use(
-    (config) => {
+    async (config) => {
         if (typeof window !== "undefined") {
+            // Client-side: read from localStorage
             // Add bearer token if user is logged in
             const token = localStorage.getItem("auth_token");
             if (token) config.headers.Authorization = `Bearer ${token}`;
 
             // Localization (default bg)
-            const locale = localStorage.getItem("locale") || "bg";
+            // Read from 'lang' key (set by LanguageContext)
+            const locale = localStorage.getItem("lang") || "bg";
             config.headers["Accept-Language"] = locale;
 
             // Guest cart token (unique UUID)
             const cartToken = getOrCreateCartToken();
             if (cartToken) config.headers["X-Cart-Token"] = cartToken;
+        } else {
+            // Server-side: read from cookies
+            try {
+                const { cookies } = await import("next/headers");
+                const cookieStore = await cookies();
+                
+                // Read auth token from cookie
+                const token = cookieStore.get("auth_token")?.value;
+                if (token) config.headers.Authorization = `Bearer ${token}`;
+
+                // Read language from cookie (set by LanguageContext via document.cookie)
+                const langCookie = cookieStore.get("lang");
+                const locale = (langCookie?.value === "en" || langCookie?.value === "bg") 
+                    ? langCookie.value 
+                    : "bg";
+                config.headers["Accept-Language"] = locale;
+            } catch (error) {
+                // If cookies() fails (e.g., not in Next.js context), default to 'bg'
+                config.headers["Accept-Language"] = "bg";
+            }
         }
 
         return config;

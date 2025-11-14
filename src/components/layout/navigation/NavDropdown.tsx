@@ -28,26 +28,31 @@ export default function NavDropdown({ item }: NavDropdownProps) {
             </Link>
 
             {/* Dropdown Menu */}
+            {/* Using pt-1 (padding-top) instead of mt-1 (margin-top) to create visual spacing
+                while keeping the gap area hoverable, preventing the menu from disappearing
+                when the mouse moves from trigger to dropdown */}
             <div
                 className="
-          absolute left-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50
+          absolute left-0 top-full pt-1 w-56 z-50
           opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100
           transform origin-top transition-all duration-150
           pointer-events-none group-hover:pointer-events-auto
         "
             >
-                <ul className="py-2">
-                    {item.dropdown?.map((dropdownItem) => (
-                        <li key={dropdownItem.href}>
-                            <Link
-                                href={dropdownItem.href}
-                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                            >
-                                {dropdownItem.name}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+                <div className="bg-white border border-gray-200 shadow-lg">
+                    <ul className="py-2">
+                        {item.dropdown?.map((dropdownItem) => (
+                            <li key={dropdownItem.href}>
+                                <Link
+                                    href={dropdownItem.href}
+                                    className="block px-4 py-2.5 text-sm font-light text-gray-900 hover:bg-gray-50 transition-colors"
+                                >
+                                    {dropdownItem.name}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );

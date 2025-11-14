@@ -20,6 +20,7 @@ export default function Logo({ variant = 'default', className = '' }: LogoProps)
                     src="/maire-logo.png"
                     alt="MAIRE"
                     fill
+                    sizes="(max-width: 768px) 50px, 60px"
                     className="object-contain"
                     priority
                 />

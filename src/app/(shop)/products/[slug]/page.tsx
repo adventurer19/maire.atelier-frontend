@@ -6,6 +6,7 @@ import ProductInfo from "@/components/products/ProductInfo";
 import RelatedProducts from "@/components/products/RelatedProducts";
 import { getTranslations } from "@/lib/getTranslations";
 import ProductBreadcrumbs from "./ProductBreadcrumbs";
+import ProductTabs from "./ProductTabs";
 
 /**
  * Product page for single product view
@@ -29,9 +30,24 @@ export async function generateMetadata({ params }: ProductPageProps) {
             return { title: "Продукт | MAIRE ATELIER" };
         }
 
+        // Get current language from cookies
+        const { cookies } = await import('next/headers');
+        const cookieStore = await cookies();
+        const langCookie = cookieStore.get('lang');
+        const lang = (langCookie?.value === 'en' || langCookie?.value === 'bg') ? langCookie.value : 'bg';
+
+        // Helper to get localized value
+        const getLocalized = (val: any) => {
+            if (typeof val === 'string') return val;
+            return val?.[lang] || val?.bg || val?.en || '';
+        };
+
+        const productName = getLocalized(product.name);
+        const metaDescription = getLocalized(product.meta_description) || getLocalized(product.description);
+
         return {
-            title: `${product.name} | MAIRE ATELIER`,
-            description: product.meta_description || product.description || "",
+            title: `${productName} | MAIRE ATELIER`,
+            description: metaDescription,
         };
     } catch (error) {
         console.error("Error generating metadata:", error);
@@ -83,7 +99,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
                 {/* Product Details Tabs - Elegant Design */}
                 <div className="mt-12 md:mt-16 lg:mt-20">
-                    <ProductTabs product={product} translations={t} />
+                    <ProductTabs product={product} />
                 </div>
 
                 {/* Related Products */}
@@ -98,70 +114,3 @@ export default async function ProductPage({ params }: ProductPageProps) {
     );
 }
 
-/**
- * Product details section with additional info - Elegant Design
- */
-function ProductTabs({ product, translations }: { product: any; translations: any }) {
-    return (
-        <div className="border-t border-gray-300">
-            {/* Description */}
-            {product.description && (
-                <div className="py-8 md:py-10 lg:py-12">
-                    <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-6 md:mb-8 tracking-tight">
-                        {translations('product.description_title')}
-                    </h2>
-                    <div className="prose prose-gray max-w-none prose-sm md:prose-base">
-                        <p className="text-gray-600 leading-relaxed text-base md:text-lg font-light">
-                            {product.description}
-                        </p>
-                    </div>
-                </div>
-            )}
-
-            {/* Material */}
-            {product.material && (
-                <div className="py-8 md:py-10 lg:py-12 border-t border-gray-300">
-                    <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-6 md:mb-8 tracking-tight">
-                        {translations('product.material')}
-                    </h2>
-                    <p className="text-gray-600 text-base md:text-lg font-light leading-relaxed">{product.material}</p>
-                </div>
-            )}
-
-            {/* Care Instructions */}
-            {product.care_instructions && (
-                <div className="py-8 md:py-10 lg:py-12 border-t border-gray-300">
-                    <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-6 md:mb-8 tracking-tight">
-                        {translations('product.care')}
-                    </h2>
-                    <p className="text-gray-600 text-base md:text-lg font-light leading-relaxed">{product.care_instructions}</p>
-                </div>
-            )}
-
-            {/* Shipping info */}
-            <div className="py-8 md:py-10 lg:py-12 border-t border-gray-300">
-                <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-6 md:mb-8 tracking-tight">
-                    {translations('product.shipping_info')}
-                </h2>
-                <ul className="space-y-3 text-gray-600 text-base md:text-lg font-light leading-relaxed">
-                    <li className="flex items-start gap-3">
-                        <span className="mt-1">•</span>
-                        <span>{translations('product.shipping_free')}</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                        <span className="mt-1">•</span>
-                        <span>{translations('product.shipping_days')}</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                        <span className="mt-1">•</span>
-                        <span>{translations('product.shipping_return')}</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                        <span className="mt-1">•</span>
-                        <span>{translations('product.shipping_gift')}</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    );
-}

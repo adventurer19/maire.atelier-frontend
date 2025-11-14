@@ -42,6 +42,7 @@ export default function CollectionDetailClient({ collection }: { collection: Col
                             src={imageUrl}
                             alt={collectionName}
                             fill
+                            sizes="100vw"
                             className="object-cover opacity-30"
                             onError={() => {
                                 setImageError(true);

@@ -33,6 +33,25 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('lang', newLang);
         // Also set cookie for server components
         document.cookie = `lang=${newLang}; path=/; max-age=31536000; SameSite=Lax`;
+        
+        // Clear localStorage cache for products (from productsApi persistent cache)
+        // This ensures fresh data is fetched with new language
+        if (typeof window !== 'undefined') {
+            try {
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.startsWith('catalog:')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                
+                // Dispatch event to invalidate React Query cache
+                // Components inside QueryProvider will listen to this
+                window.dispatchEvent(new CustomEvent('language-changed', { detail: { lang: newLang } }));
+            } catch (e) {
+                // Ignore errors
+            }
+        }
     };
 
     // 🧠 t() с поддръжка на nested ключове (product.in_stock)

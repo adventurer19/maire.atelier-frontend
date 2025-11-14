@@ -6,10 +6,10 @@ export interface Collection {
     id: number;
     slug: string;
     type: 'manual' | 'auto';
-    name: string;
-    description?: string | null;
-    meta_title?: string | null;
-    meta_description?: string | null;
+    name: string | { bg: string; en: string };
+    description?: string | { bg: string; en: string } | null;
+    meta_title?: string | { bg: string; en: string } | null;
+    meta_description?: string | { bg: string; en: string } | null;
     image?: string | null;
     is_active: boolean;
     is_featured: boolean;

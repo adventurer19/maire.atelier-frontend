@@ -12,19 +12,19 @@ export default function Footer() {
             <div className="container px-6 max-w-7xl mx-auto">
                 {/* Newsletter Section */}
                 <div className="max-w-4xl mx-auto mb-8 md:mb-10 lg:mb-12 text-center px-4 pt-8 md:pt-10 lg:pt-12 pb-8 md:pb-10 lg:pb-12 border-t border-b border-white border-opacity-10">
-                    <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-4 tracking-wide">{t('footer.newsletter_title', { default: '' }) || 'Join our newsletter'}</h2>
-                    <p className="text-sm md:text-base text-[#999] mb-4 md:mb-6 max-w-lg mx-auto">{t('footer.newsletter_subtitle', { default: '' }) || 'Subscribe to receive the latest updates, offers, and style inspiration.'}</p>
+                    <h2 className="text-xl md:text-2xl font-light mb-3 md:mb-4 tracking-tight">{t('footer.newsletter_title', { default: '' }) || 'Join our newsletter'}</h2>
+                    <p className="text-sm md:text-base text-[#999] mb-4 md:mb-6 max-w-lg mx-auto font-light">{t('footer.newsletter_subtitle', { default: '' }) || 'Subscribe to receive the latest updates, offers, and style inspiration.'}</p>
                     <form className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
                         <input
                             type="email"
                             placeholder={t('footer.email_placeholder', { default: '' }) || 'Enter your email'}
                             aria-label="Email address"
                             required
-                            className="w-full px-4 py-3 md:py-3 rounded bg-[#1A1A1A] text-[#EAEAEA] placeholder-[#999] border border-[#333] focus:outline-none focus:ring-2 focus:ring-[#EAEAEA] text-sm md:text-base min-h-[48px]"
+                            className="w-full px-4 py-3 md:py-3 bg-[#1A1A1A] text-[#EAEAEA] placeholder-[#999] border border-[#333] focus:outline-none focus:ring-2 focus:ring-[#EAEAEA] text-sm md:text-base min-h-[48px] transition-all duration-300"
                         />
                         <button
                             type="submit"
-                            className="px-6 py-3 md:py-3 bg-[#EAEAEA] text-[#0E0E11] font-semibold rounded hover:bg-[#d4d4d4] active:bg-[#c4c4c4] transition-colors text-sm md:text-base min-h-[48px] whitespace-nowrap touch-manipulation"
+                            className="px-6 py-3 md:py-3 bg-[#EAEAEA] text-[#0E0E11] font-light hover:bg-[#d4d4d4] active:bg-[#c4c4c4] transition-all duration-300 text-sm md:text-base min-h-[48px] whitespace-nowrap touch-manipulation border-2 border-[#EAEAEA]"
                         >
                             {t('footer.subscribe') || 'Subscribe'}
                         </button>
@@ -67,7 +67,7 @@ export default function Footer() {
 
                     {/* Navigation Links */}
                     <div>
-                        <h3 className="text-base md:text-lg font-semibold mb-4 md:mb-6 tracking-wide">{t('footer.navigation') || 'Navigation'}</h3>
+                        <h3 className="text-base md:text-lg font-light mb-4 md:mb-6 tracking-tight">{t('footer.navigation') || 'Navigation'}</h3>
                         <nav className="flex flex-col space-y-2 md:space-y-3 text-sm text-[#999]">
                             <FooterLink href="/products">{t('navigation.products')}</FooterLink>
                             <FooterLink href="/collections">{t('navigation.collections')}</FooterLink>
@@ -79,7 +79,7 @@ export default function Footer() {
 
                     {/* Customer Service */}
                     <div>
-                        <h3 className="text-base md:text-lg font-semibold mb-4 md:mb-6 tracking-wide">{t('footer.help') || 'Help'}</h3>
+                        <h3 className="text-base md:text-lg font-light mb-4 md:mb-6 tracking-tight">{t('footer.help') || 'Help'}</h3>
                         <nav className="flex flex-col space-y-2 md:space-y-3 text-sm text-[#999]">
                             <FooterLink href="/shipping">{t('footer.shipping') || 'Shipping'}</FooterLink>
                             <FooterLink href="/returns">{t('footer.returns') || 'Returns'}</FooterLink>
@@ -91,7 +91,7 @@ export default function Footer() {
 
                     {/* Contact Info */}
                     <div>
-                        <h3 className="text-base md:text-lg font-semibold mb-4 md:mb-6 tracking-wide">{t('navigation.contact')}</h3>
+                        <h3 className="text-base md:text-lg font-light mb-4 md:mb-6 tracking-tight">{t('navigation.contact')}</h3>
                         <address className="not-italic space-y-3 md:space-y-4 text-sm text-[#999]">
                             <a href="mailto:info@maire-atelier.com" className="flex items-center gap-3 hover:underline hover:text-[#EAEAEA] transition">
                                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

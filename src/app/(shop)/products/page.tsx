@@ -25,6 +25,7 @@ interface ProductsPageProps {
         price_max?: string;
         in_stock?: string;
         sale?: string;
+        search?: string;
     }>;
 }
 
@@ -36,6 +37,7 @@ async function getProducts(searchParams: Awaited<ProductsPageProps['searchParams
     const priceMax = searchParams.price_max ? Number(searchParams.price_max) : undefined;
     const inStock = searchParams.in_stock === '1';
     const onSale = searchParams.sale === 'true';
+    const search = searchParams.search?.trim();
 
     try {
         const params: any = {
@@ -43,6 +45,11 @@ async function getProducts(searchParams: Awaited<ProductsPageProps['searchParams
             per_page: 12,
             sort,
         };
+
+        // Add search filter if provided
+        if (search) {
+            params.search = search;
+        }
 
         // Add category filter if provided
         if (category) {
@@ -120,7 +127,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     {/* Main Content */}
                     <div className="flex-1 min-w-0">
                         {/* Toolbar */}
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 bg-white p-3 md:p-4 rounded-lg shadow-sm gap-3 md:gap-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 bg-white border border-gray-200 shadow-sm p-3 md:p-4 gap-3 md:gap-4">
                             <div className="flex items-center gap-3 w-full sm:w-auto">
                                 {/* Mobile Filters Button */}
                                 <MobileFiltersButton
@@ -137,7 +144,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                                 </div>
 
                                 {/* Sort Dropdown */}
-                                <ProductSort currentSort={params.sort} />
+                                <ProductSort />
                             </div>
                         </div>
 
