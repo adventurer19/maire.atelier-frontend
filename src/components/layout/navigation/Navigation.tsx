@@ -1,37 +1,56 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import MobileMenu from './MobileMenu';
 import NavDropdown from './NavDropdown';
 import type { NavItem } from '@/types/navigation';
 import { categoriesApi } from '@/lib/api/categories';
 import { useLanguage } from '@/context/LanguageContext';
+import type { Category } from '@/types';
 
 export default function Navigation() {
     const { t, lang } = useLanguage();
-    const [categories, setCategories] = useState<NavItem['dropdown']>([]);
+    const [rawCategories, setRawCategories] = useState<Category[]>([]);
 
-    // 🧠 Зареждаме категориите от бекенда
+    // 🧠 Зареждаме категориите от бекенда само веднъж при mount
     useEffect(() => {
+        let isMounted = true;
+        
         async function loadCategories() {
             try {
                 const cats = await categoriesApi.getMenuCategories();
-                const formatted = cats.map((cat) => ({
-                    name:
-                        typeof cat.name === 'string'
-                            ? cat.name
-                            : cat.name?.[lang] || 'Category',
-                    href: `/products?category=${cat.slug}`,
-                }));
-                setCategories(formatted);
+                if (!isMounted) return;
+                
+                // Store raw categories with multilingual names
+                setRawCategories(cats);
             } catch (error) {
+                if (isMounted) {
                 console.error('❌ Error loading menu categories:', error);
+                }
             }
         }
 
         loadCategories();
-    }, [lang]);
+        
+        return () => {
+            isMounted = false;
+        };
+    }, []); // Load only once on mount - no dependencies
+    
+    // Format categories with current lang (without API calls)
+    // This updates display names when lang changes, but doesn't re-fetch from API
+    const categories = useMemo(() => {
+        if (rawCategories.length === 0) return [];
+        
+        return rawCategories.map((cat) => ({
+            name:
+                typeof cat.name === 'string'
+                    ? cat.name
+                    : cat.name?.[lang] || cat.name?.bg || cat.name?.en || 'Category',
+            href: `/products?category=${cat.slug}`,
+        }));
+    }, [rawCategories, lang]); // Only recalculate when rawCategories or lang changes
 
     // 🧩 Навигационни елементи с преводи
     const navItems: NavItem[] = [

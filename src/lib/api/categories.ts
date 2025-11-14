@@ -4,9 +4,11 @@ import { apiClient } from "./client";
 export interface Category {
     id: number;
     slug: string;
-    name: string;
-    description?: string;
-    image?: string;
+    name: string | { bg: string; en: string };
+    description?: string | { bg: string; en: string };
+    meta_title?: string | { bg: string; en: string } | null;
+    meta_description?: string | { bg: string; en: string } | null;
+    image?: string | null;
     parent_id?: number | null;
     is_active: boolean;
     is_featured: boolean;

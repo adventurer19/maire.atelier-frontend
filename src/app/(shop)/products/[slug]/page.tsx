@@ -68,10 +68,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {/* Breadcrumbs - Client component for dynamic language switching */}
             <ProductBreadcrumbs productName={productName} />
 
-
-            {/* Product Content */}
-            <div className="container px-4 py-4 md:py-8 lg:py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-12">
+            {/* Product Content - Elegant Layout */}
+            <div className="container px-4 md:px-6 lg:px-8 max-w-7xl mx-auto py-8 md:py-12 lg:py-16">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 lg:gap-16">
                     {/* Product Gallery */}
                     <ProductGallery
                         images={product.images || []}
@@ -82,13 +81,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     <ProductInfo product={product} />
                 </div>
 
-                {/* Product Details Tabs */}
-                <div className="mt-8 md:mt-12 lg:mt-16">
+                {/* Product Details Tabs - Elegant Design */}
+                <div className="mt-12 md:mt-16 lg:mt-20">
                     <ProductTabs product={product} translations={t} />
                 </div>
 
                 {/* Related Products */}
-                <div className="mt-8 md:mt-12 lg:mt-16">
+                <div className="mt-12 md:mt-16 lg:mt-20">
                     <RelatedProducts
                         categoryId={product.categories?.[0]?.id}
                         currentProductId={product.id}
@@ -100,19 +99,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
 }
 
 /**
- * Product details section with additional info
+ * Product details section with additional info - Elegant Design
  */
 function ProductTabs({ product, translations }: { product: any; translations: any }) {
     return (
-        <div className="border-t border-gray-200">
+        <div className="border-t border-gray-300">
             {/* Description */}
             {product.description && (
-                <div className="py-6 md:py-8">
-                    <h2 className="text-xl md:text-2xl font-serif font-bold text-gray-900 mb-4 md:mb-6">
+                <div className="py-8 md:py-10 lg:py-12">
+                    <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-6 md:mb-8 tracking-tight">
                         {translations('product.description_title')}
                     </h2>
                     <div className="prose prose-gray max-w-none prose-sm md:prose-base">
-                        <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+                        <p className="text-gray-600 leading-relaxed text-base md:text-lg font-light">
                             {product.description}
                         </p>
                     </div>
@@ -121,34 +120,46 @@ function ProductTabs({ product, translations }: { product: any; translations: an
 
             {/* Material */}
             {product.material && (
-                <div className="py-6 md:py-8 border-t border-gray-200">
-                    <h2 className="text-xl md:text-2xl font-serif font-bold text-gray-900 mb-4 md:mb-6">
+                <div className="py-8 md:py-10 lg:py-12 border-t border-gray-300">
+                    <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-6 md:mb-8 tracking-tight">
                         {translations('product.material')}
                     </h2>
-                    <p className="text-gray-600 text-sm md:text-base">{product.material}</p>
+                    <p className="text-gray-600 text-base md:text-lg font-light leading-relaxed">{product.material}</p>
                 </div>
             )}
 
             {/* Care Instructions */}
             {product.care_instructions && (
-                <div className="py-6 md:py-8 border-t border-gray-200">
-                    <h2 className="text-xl md:text-2xl font-serif font-bold text-gray-900 mb-4 md:mb-6">
+                <div className="py-8 md:py-10 lg:py-12 border-t border-gray-300">
+                    <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-6 md:mb-8 tracking-tight">
                         {translations('product.care')}
                     </h2>
-                    <p className="text-gray-600 text-sm md:text-base">{product.care_instructions}</p>
+                    <p className="text-gray-600 text-base md:text-lg font-light leading-relaxed">{product.care_instructions}</p>
                 </div>
             )}
 
             {/* Shipping info */}
-            <div className="py-6 md:py-8 border-t border-gray-200">
-                <h2 className="text-xl md:text-2xl font-serif font-bold text-gray-900 mb-4 md:mb-6">
+            <div className="py-8 md:py-10 lg:py-12 border-t border-gray-300">
+                <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-6 md:mb-8 tracking-tight">
                     {translations('product.shipping_info')}
                 </h2>
-                <ul className="space-y-2 text-gray-600 text-sm md:text-base">
-                    <li>✓ {translations('product.shipping_free')}</li>
-                    <li>✓ {translations('product.shipping_days')}</li>
-                    <li>✓ {translations('product.shipping_return')}</li>
-                    <li>✓ {translations('product.shipping_gift')}</li>
+                <ul className="space-y-3 text-gray-600 text-base md:text-lg font-light leading-relaxed">
+                    <li className="flex items-start gap-3">
+                        <span className="mt-1">•</span>
+                        <span>{translations('product.shipping_free')}</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="mt-1">•</span>
+                        <span>{translations('product.shipping_days')}</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="mt-1">•</span>
+                        <span>{translations('product.shipping_return')}</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="mt-1">•</span>
+                        <span>{translations('product.shipping_gift')}</span>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -41,3 +41,13 @@
     max-width: 1400px; /* ← По-широко от 1280px */
   }
 }
+
+/* Hide scrollbar for carousels */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

@@ -37,10 +37,10 @@ export default async function RelatedProducts({
 
         return (
             <div>
-                <h2 className="text-xl md:text-2xl font-serif font-bold text-gray-900 mb-6 md:mb-8">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 mb-8 md:mb-10 lg:mb-12 tracking-tight">
                     {t('product.related_products')}
                 </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
                     {relatedProducts.map((product: any) => (
                         <ProductCard key={product.id} product={product} />
                     ))}

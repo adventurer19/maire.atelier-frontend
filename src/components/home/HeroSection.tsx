@@ -11,67 +11,88 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ latestCollection }: HeroSectionProps) {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
     const collectionSlug = latestCollection?.slug;
     const products = latestCollection?.products || [];
 
-    // Resolve collection name and descriptions
+    // Resolve collection name and descriptions with proper fallback
     const name =
         latestCollection && typeof latestCollection.name !== 'string'
-            ? latestCollection.name?.bg || latestCollection.name?.en || t('home.hero_title') || 'Нова Колекция'
-            : latestCollection?.name || t('home.hero_title') || 'Нова Колекция';
+            ? latestCollection.name?.[lang] || latestCollection.name?.bg || latestCollection.name?.en || t('home.hero_title')
+            : latestCollection?.name || t('home.hero_title');
     
     const description =
         latestCollection && typeof latestCollection.description !== 'string'
-            ? latestCollection.description?.bg || latestCollection.description?.en || t('home.hero_description') || 'Открийте елегантността в детайлите с нашата най-нова колекция от модни дрехи'
-            : latestCollection?.description || t('home.hero_description') || 'Открийте елегантността в детайлите с нашата най-нова колекция от модни дрехи';
+            ? latestCollection.description?.[lang] || latestCollection.description?.bg || latestCollection.description?.en || t('home.hero_description')
+            : latestCollection?.description || t('home.hero_description');
 
     return (
-        <section className="relative min-h-[400px] md:min-h-[450px] lg:min-h-[45vh] overflow-hidden bg-[#F5F1EB]">
+        <section className="relative min-h-[500px] md:min-h-[600px] lg:min-h-[70vh] overflow-hidden bg-gradient-to-br from-white via-[#FCFCFB] to-white">
             <div className="container px-4 sm:px-6 lg:px-8 h-full">
-                <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.2fr] gap-6 lg:gap-10 h-full py-5 md:py-8 lg:py-10">
-                    {/* Left Column - Text Content (inspired by NISOLO) */}
-                    <div className="flex flex-col justify-center max-w-xl">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 h-full py-8 md:py-12 lg:py-16">
+                    {/* Left Column - Text Content (Loro Piana inspired) */}
+                    <div className="flex flex-col justify-center max-w-2xl">
+                        {/* Season/Subtitle */}
+                        <div className="text-gray-600 text-sm md:text-base font-light tracking-wider uppercase mb-2 md:mb-3">
+                            {t('home.hero_subtitle')}
+                        </div>
+
                         {/* Main Heading */}
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-light text-gray-900 leading-tight mb-3 md:mb-4 tracking-tight">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-gray-900 leading-tight mb-4 md:mb-6 tracking-tight">
                             {name}
                         </h1>
 
-                        {/* Subheading */}
-                        <p className="text-base md:text-lg lg:text-xl text-gray-700 mb-6 md:mb-8 leading-relaxed font-light max-w-xl">
+                        {/* Description */}
+                        <p className="text-base md:text-lg lg:text-xl text-gray-600 mb-8 md:mb-10 leading-relaxed font-light max-w-xl">
                             {description}
                         </p>
 
-                        {/* CTA Button - Single button (NISOLO style) */}
+                        {/* CTA Button */}
                         <div>
                             {collectionSlug ? (
                                 <Link
                                     href={`/collections/${collectionSlug}`}
-                                    className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-medium rounded-md border-2 border-gray-900 hover:bg-gray-50 active:bg-gray-100 transition-colors text-sm md:text-base min-h-[52px] shadow-sm"
+                                    className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-medium border border-gray-900 hover:bg-gray-50 active:bg-gray-100 transition-all duration-300 text-sm md:text-base min-h-[52px] group"
                                 >
-                                    {t('home.cta_primary') || 'Разгледай Колекцията'}
+                                    {t('home.cta_primary')}
+                                    <svg 
+                                        className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" 
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </Link>
                             ) : (
                                 <Link
                                     href="/products"
-                                    className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-medium rounded-md border-2 border-gray-900 hover:bg-gray-50 active:bg-gray-100 transition-colors text-sm md:text-base min-h-[52px] shadow-sm"
+                                    className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-medium border border-gray-900 hover:bg-gray-50 active:bg-gray-100 transition-all duration-300 text-sm md:text-base min-h-[52px] group"
                                 >
-                                    {t('home.cta_primary') || 'Разгледай Колекцията'}
+                                    {t('home.cta_primary')}
+                                    <svg 
+                                        className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" 
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </Link>
                             )}
                         </div>
                     </div>
 
                     {/* Right Column - Product Images Carousel */}
-                    <div className="relative h-[320px] sm:h-[360px] md:h-[400px] lg:h-full flex items-center justify-center lg:justify-end">
+                    <div className="relative h-[400px] sm:h-[500px] md:h-[600px] lg:h-full flex items-center justify-center">
                         {products.length > 0 ? (
-                            <div className="w-full max-w-lg lg:max-w-4xl xl:max-w-5xl h-full">
+                            <div className="w-full max-w-lg lg:max-w-full h-full">
                                 <ProductCarousel products={products} collectionSlug={collectionSlug} />
                             </div>
                         ) : (
-                            <div className="w-full max-w-lg lg:max-w-4xl xl:max-w-5xl h-full bg-white/50 rounded-2xl flex items-center justify-center border border-gray-200">
-                                <p className="text-gray-600 text-center px-4">
-                                    {t('home.no_collection_products') || 'Продуктите се зареждат...'}
+                            <div className="w-full max-w-lg lg:max-w-full h-full bg-gray-50 rounded-lg flex items-center justify-center border border-gray-200">
+                                <p className="text-gray-500 text-center px-4">
+                                    {t('home.no_collection_products')}
                                 </p>
                             </div>
                         )}

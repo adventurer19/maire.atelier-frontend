@@ -60,24 +60,7 @@ export default function CategoriesClient({
             </div>
 
             <div className="container px-4 md:px-6 py-8 md:py-10 lg:py-12">
-                {/* Featured Categories */}
-                {featuredCategories.length > 0 && (
-                    <section className="mb-8 md:mb-12 lg:mb-16">
-                        <div className="flex items-center justify-between mb-4 md:mb-6 lg:mb-8">
-                            <h2 className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-gray-900">
-                                {t('categories.featured_title')}
-                            </h2>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
-                            {featuredCategories.map((category) => (
-                                <CategoryCard key={category.id} category={category} featured />
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-                {/* All Categories */}
+                {/* All Categories Grid */}
                 <section>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 lg:mb-8 gap-2 md:gap-4">
                         <h2 className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-gray-900">
@@ -91,10 +74,10 @@ export default function CategoriesClient({
                         </span>
                     </div>
 
-                    {regularCategories.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
-                            {regularCategories.map((category) => (
-                                <CategoryCard key={category.id} category={category} />
+                    {rootCategories.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+                            {rootCategories.map((category) => (
+                                <CategoryCard key={category.id} category={category} featured />
                             ))}
                         </div>
                     ) : (

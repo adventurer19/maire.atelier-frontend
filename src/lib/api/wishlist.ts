@@ -18,8 +18,18 @@ export const wishlistApi = {
      * GET /api/wishlist
      */
     getWishlist: async (): Promise<Product[]> => {
-        const response = await apiClient.get<ApiResponse<Product[]>>('/wishlist');
-        return response.data.data || [];
+        try {
+            const response = await apiClient.get<ApiResponse<Product[]>>('/wishlist');
+            return response.data.data || [];
+        } catch (error: any) {
+            // If user is not authenticated (401), return empty array instead of throwing
+            // This allows the component to work for non-authenticated users
+            if (error?.response?.status === 401) {
+                return [];
+            }
+            // Re-throw other errors
+            throw error;
+        }
     },
 
     /**

@@ -76,18 +76,23 @@ export interface ProductVariant {
     id: number;
     sku: string;
     price: number;
+    final_price?: number;
     stock_quantity: number;
     is_active: boolean;
     is_in_stock: boolean;
     attributes: AttributeOption[];
-    variant_name: string;
+    variant_name?: string;
+    label?: string;
+    size?: string; // Size value for convenience (e.g., "M", "L", "XL")
     images: string[];
 }
 
 export interface AttributeOption {
+    id: number;
+    slug: string;
     name: string;
     value: string;
-    hex_color: string | null;
+    // hex_color removed - we only use size attribute now
 }
 
 export interface PaginationMeta {

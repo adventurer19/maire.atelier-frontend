@@ -36,12 +36,50 @@ export const ordersApi = {
      * POST /api/orders
      */
     createOrder: async (payload: {
-        address_id: number;
         payment_method: string;
+        payment_data?: Record<string, any>;
+        shipping_provider: string;
+        shipping_method: string;
+        shipping_office_id?: string;
+        shipping_office_name?: string;
+        shipping_office_address?: string;
+        shipping_address?: {
+            first_name: string;
+            last_name: string;
+            company?: string;
+            address_line1: string;
+            address_line2?: string;
+            city: string;
+            state?: string;
+            postal_code?: string;
+            country?: string;
+            phone: string;
+            email?: string;
+        };
+        guest_name?: string;
+        guest_email?: string;
+        guest_phone?: string;
+        cart_token?: string;
+        requires_invoice?: boolean;
+        invoice_company_name?: string;
+        invoice_tax_number?: string;
+        invoice_address?: string;
         notes?: string;
+        discount_total?: number;
     }): Promise<Order> => {
         const response = await apiClient.post<ApiResponse<Order>>('/orders', payload);
         return response.data.data;
+    },
+
+    /**
+     * Get shipping offices for a provider
+     * GET /api/shipping/offices
+     */
+    getShippingOffices: async (provider: string, city?: string): Promise<any[]> => {
+        const params = new URLSearchParams({ provider });
+        if (city) params.append('city', city);
+        const response = await apiClient.get<ApiResponse<any[]>>(`/shipping/offices?${params.toString()}`);
+        return response.data.data || [];
     },
 
     /**

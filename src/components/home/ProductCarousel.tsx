@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useLanguage } from '@/context/LanguageContext';
 import type { Product } from '@/types';
 
 interface ProductCarouselProps {
@@ -12,6 +13,7 @@ interface ProductCarouselProps {
 }
 
 export default function ProductCarousel({ products, collectionSlug }: ProductCarouselProps) {
+    const { t, lang } = useLanguage();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
 
@@ -33,7 +35,7 @@ export default function ProductCarousel({ products, collectionSlug }: ProductCar
     const currentProduct = products[currentIndex];
     const productName = typeof currentProduct.name === 'string'
         ? currentProduct.name
-        : currentProduct.name?.bg || currentProduct.name?.en || 'Product';
+        : currentProduct.name?.[lang] || currentProduct.name?.bg || currentProduct.name?.en || 'Product';
 
     // Get image with fallback
     const getImageUrl = () => {
@@ -66,18 +68,18 @@ export default function ProductCarousel({ products, collectionSlug }: ProductCar
             onTouchStart={() => setIsPaused(true)}
             onTouchEnd={() => setIsPaused(false)}
         >
-            {/* Product Card - Postcard style with tall image */}
-            <div className="relative w-full h-full bg-white rounded-xl overflow-hidden transition-all duration-700 ease-out shadow-lg group-hover:shadow-2xl border border-gray-100 flex flex-col">
-                {/* Image Section - Slightly shorter aspect ratio */}
+            {/* Product Card - Sharp, Clean Design (Loro Piana Style) */}
+            <div className="relative w-full h-full bg-white overflow-hidden transition-all duration-300 ease-out shadow-sm group-hover:shadow-md border border-gray-300 flex flex-col">
+                {/* Image Section - Sharp Design */}
                 <Link
                     href={`/products/${currentProduct.slug}`}
-                    className="relative w-full aspect-[1/0.85] overflow-hidden bg-white flex items-center justify-center"
+                    className="relative w-full aspect-[1/0.85] overflow-hidden bg-gray-50 flex items-center justify-center"
                 >
                     {imageUrl ? (
                         <>
-                            {/* Discount Badge */}
+                            {/* Discount Badge - Sharp Design */}
                             {hasDiscount && (
-                                <div className="absolute top-4 right-4 z-20 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+                                <div className="absolute top-4 right-4 z-20 bg-white/95 backdrop-blur-sm text-gray-900 text-[11px] md:text-xs font-normal px-3 md:px-3.5 py-1.5 tracking-wider uppercase border border-gray-300">
                                     -{discountPercent}%
                                 </div>
                             )}
@@ -87,22 +89,22 @@ export default function ProductCarousel({ products, collectionSlug }: ProductCar
                                     alt={productName}
                                     fill
                                     sizes="(max-width: 768px) 100vw, 50vw"
-                                    className="object-contain object-center transition-transform duration-1000 ease-out group-hover:scale-105"
+                                    className="object-contain object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                                     priority={currentIndex === 0}
                                     unoptimized
                                 />
                             </div>
-                            {/* CTA Button Overlay on Hover - Modern UX Pattern */}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 z-10 pointer-events-none">
-                                <div className="px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-gray-50 hover:scale-105 whitespace-nowrap pointer-events-auto">
-                                    Разгледай Продукта
+                            {/* CTA Button Overlay on Hover - Sharp Design */}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 z-10 pointer-events-none">
+                                <div className="px-6 py-3 bg-white text-gray-900 font-medium border border-gray-900 shadow-md transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 hover:bg-gray-50 whitespace-nowrap pointer-events-auto">
+                                    {t('product.view_product')}
                                 </div>
                             </div>
                         </>
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                        <div className="w-full h-full flex items-center justify-center bg-gray-50 border-b border-gray-200">
                             <svg
-                                className="w-24 h-24 text-gray-400"
+                                className="w-16 h-16 md:w-20 md:h-20 text-gray-300"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -110,7 +112,7 @@ export default function ProductCarousel({ products, collectionSlug }: ProductCar
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    strokeWidth={1.5}
+                                    strokeWidth={1}
                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                                 />
                             </svg>
@@ -118,43 +120,43 @@ export default function ProductCarousel({ products, collectionSlug }: ProductCar
                     )}
                 </Link>
 
-                {/* Product Info Section - Optimized Layout */}
-                <div className="px-5 py-4 border-t border-gray-100 bg-white">
+                {/* Product Info Section - Sharp, Clean Typography */}
+                <div className="px-5 py-4 border-t border-gray-300 bg-white">
                     {/* Product Name */}
                     <Link href={`/products/${currentProduct.slug}`}>
-                        <h3 className="font-serif font-medium text-gray-900 text-base mb-3 line-clamp-2 group-hover:text-gray-700 transition-colors leading-snug">
+                        <h3 className="font-light text-base md:text-lg text-gray-900 mb-3 group-hover:text-gray-600 transition-colors duration-300 line-clamp-2 leading-relaxed tracking-normal">
                             {productName}
                         </h3>
                     </Link>
                     
-                    {/* Price Section */}
-                    <div className="flex flex-col">
-                        <div className="flex items-baseline gap-2">
+                    {/* Price Section - Elegant & Minimal */}
+                    <div className="flex flex-col gap-1.5">
+                        <div className="flex items-baseline gap-3">
                             {hasDiscount ? (
                                 <>
-                                    <span className="text-xl font-bold text-gray-900">
-                                        {price.toFixed(2)} лв
+                                    <span className="text-lg md:text-xl font-light text-gray-900 tracking-normal">
+                                        {price.toFixed(2)} {t('product.currency')}
                                     </span>
-                                    <span className="text-sm text-gray-400 line-through">
-                                        {comparePrice?.toFixed(2)} лв
+                                    <span className="text-sm md:text-base text-gray-400 line-through font-extralight">
+                                        {comparePrice?.toFixed(2)} {t('product.currency')}
                                     </span>
                                 </>
                             ) : (
-                                <span className="text-xl font-bold text-gray-900">
-                                    {price.toFixed(2)} лв
+                                <span className="text-lg md:text-xl font-light text-gray-900 tracking-normal">
+                                    {price.toFixed(2)} {t('product.currency')}
                                 </span>
                             )}
                         </div>
                         {hasDiscount && (
-                            <span className="text-xs text-red-600 font-medium mt-0.5">
-                                Спестете {((comparePrice || 0) - price).toFixed(2)} лв
+                            <span className="text-[11px] text-gray-400 font-extralight tracking-wide">
+                                {t('product.save_amount', { amount: ((comparePrice || 0) - price).toFixed(2) })}
                             </span>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Navigation Arrows - Subtle and Minimalist */}
+            {/* Navigation Arrows - Sharp, Clean Design */}
             {products.length > 1 && (
                 <>
                     <button
@@ -163,11 +165,11 @@ export default function ProductCarousel({ products, collectionSlug }: ProductCar
                             e.stopPropagation();
                             setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
                         }}
-                        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm text-gray-900 rounded-full w-10 h-10 items-center justify-center shadow-md transition-all duration-300 hover:scale-110 opacity-0 group-hover:opacity-100 z-20 border border-gray-200"
-                        aria-label="Previous product"
+                        className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/95 hover:bg-white backdrop-blur-sm text-gray-900 w-10 h-10 items-center justify-center shadow-sm transition-all duration-300 hover:shadow-md opacity-0 group-hover:opacity-100 z-20 border border-gray-300"
+                        aria-label={t('common.previous')}
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
                     <button
@@ -176,19 +178,19 @@ export default function ProductCarousel({ products, collectionSlug }: ProductCar
                             e.stopPropagation();
                             setCurrentIndex((prev) => (prev + 1) % products.length);
                         }}
-                        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white backdrop-blur-sm text-gray-900 rounded-full w-10 h-10 items-center justify-center shadow-md transition-all duration-300 hover:scale-110 opacity-0 group-hover:opacity-100 z-20 border border-gray-200"
-                        aria-label="Next product"
+                        className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/95 hover:bg-white backdrop-blur-sm text-gray-900 w-10 h-10 items-center justify-center shadow-sm transition-all duration-300 hover:shadow-md opacity-0 group-hover:opacity-100 z-20 border border-gray-300"
+                        aria-label={t('common.next')}
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
                         </svg>
                     </button>
                 </>
             )}
 
-            {/* Pagination Dots - Above product info */}
+            {/* Pagination Dots - Sharp, Minimal Design */}
             {products.length > 1 && (
-                <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-10 items-center">
                     {products.map((_, index) => (
                         <button
                             key={index}
@@ -197,12 +199,12 @@ export default function ProductCarousel({ products, collectionSlug }: ProductCar
                                 e.stopPropagation();
                                 setCurrentIndex(index);
                             }}
-                            className={`transition-all duration-300 rounded-full ${
+                            className={`transition-all duration-300 ${
                                 index === currentIndex
-                                    ? 'w-8 h-2 bg-gray-900'
-                                    : 'w-2 h-2 bg-gray-900/40 hover:bg-gray-900/60 cursor-pointer'
+                                    ? 'w-8 h-0.5 bg-gray-900'
+                                    : 'w-8 h-0.5 bg-gray-900/30 hover:bg-gray-900/50 cursor-pointer'
                             }`}
-                            aria-label={`Go to product ${index + 1}`}
+                            aria-label={t('product.go_to_product', { number: index + 1 })}
                         />
                     ))}
                 </div>

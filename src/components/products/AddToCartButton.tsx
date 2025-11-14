@@ -1,8 +1,9 @@
-// src/components/product/AddToCartButton.tsx
+// src/components/products/AddToCartButton.tsx
 'use client';
 
 import { useState } from 'react';
 import { useAddToCart } from '@/hooks/useCart';
+import { useLanguage } from '@/context/LanguageContext';
 import type { AddToCartPayload } from '@/types/cart';
 
 interface AddToCartButtonProps {
@@ -22,6 +23,7 @@ export default function AddToCartButton({
                                             showQuantitySelector = false,
                                             disabled = false,
                                         }: AddToCartButtonProps) {
+    const { t } = useLanguage();
     const [quantity, setQuantity] = useState(initialQuantity);
     const [notification, setNotification] = useState<{
         type: 'success' | 'error';
@@ -33,7 +35,7 @@ export default function AddToCartButton({
     const handleAddToCart = async () => {
         if (disabled) return;
         if (!variantId && typeof variantId !== 'number') {
-            setNotification({ type: 'error', message: 'Моля, изберете вариант.' });
+            setNotification({ type: 'error', message: t('product.choose_variant_first') || t('product.choose_variant') });
             setTimeout(() => setNotification(null), 2500);
             return;
         }
@@ -49,7 +51,7 @@ export default function AddToCartButton({
             // Show success notification
             setNotification({
                 type: 'success',
-                message: 'Added to cart!',
+                message: t('cart.added_to_cart') || t('product.add_to_cart'),
             });
             setTimeout(() => setNotification(null), 2000);
         } catch (error: any) {
@@ -59,7 +61,7 @@ export default function AddToCartButton({
                 message:
                     error?.response?.data?.message ||
                     error?.message ||
-                    'Failed to add to cart',
+                    t('cart.add_to_cart_error') || t('product.add_to_cart'),
             });
             setTimeout(() => setNotification(null), 3000);
         }
@@ -71,27 +73,27 @@ export default function AddToCartButton({
         <div className="relative">
             <div className="flex items-center gap-3">
                 {showQuantitySelector && (
-                    <div className="flex items-center border border-gray-300 rounded-md">
+                    <div className="flex items-center border-2 border-gray-300">
                         <button
                             type="button"
                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                            className="px-3 py-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-2 hover:bg-gray-50 active:bg-gray-100 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed border-r-2 border-gray-300"
                             disabled={isLoading || quantity <= 1}
-                            aria-label="Decrease quantity"
+                            aria-label={t('product.decrease_quantity') || 'Decrease quantity'}
                         >
-                            −
+                            <span className="font-light">−</span>
                         </button>
-                        <span className="px-4 py-2 min-w-[3rem] text-center font-medium">
+                        <span className="px-4 py-2 min-w-[3rem] text-center font-light border-r-2 border-gray-300">
               {quantity}
             </span>
                         <button
                             type="button"
                             onClick={() => setQuantity(quantity + 1)}
-                            className="px-3 py-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-3 py-2 hover:bg-gray-50 active:bg-gray-100 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={isLoading}
-                            aria-label="Increase quantity"
+                            aria-label={t('product.increase_quantity') || 'Increase quantity'}
                         >
-                            +
+                            <span className="font-light">+</span>
                         </button>
                     </div>
                 )}
@@ -101,36 +103,38 @@ export default function AddToCartButton({
                     onClick={handleAddToCart}
                     disabled={isLoading || disabled}
                     className={`
-            flex-1 px-6 py-3 
-            bg-gray-900 text-white font-medium 
-            rounded-md hover:bg-gray-800 
+                        w-full px-6 py-4 md:py-4
+                        bg-gray-900 text-white font-light
+                        hover:bg-gray-800 active:bg-gray-700
             disabled:opacity-50 disabled:cursor-not-allowed
-            transition-all duration-200
+                        transition-all duration-300
             flex items-center justify-center gap-2
+                        min-h-[48px]
             ${className}
           `}
                 >
                     {isLoading ? (
                         <>
                             <LoadingSpinner />
-                            <span>Adding...</span>
+                            <span>{t('cart.adding') || t('product.add_to_cart')}</span>
                         </>
                     ) : (
-                        'Add to Cart'
+                        t('product.add_to_cart')
                     )}
                 </button>
             </div>
 
-            {/* Success/Error Notification */}
+            {/* Success/Error Notification - Sharp Design */}
             {notification && (
                 <div
                     className={`
             absolute -bottom-12 left-0 right-0 
-            px-4 py-2 rounded-md text-sm font-medium text-center
+                        px-4 py-3 text-sm font-light text-center
             animate-in fade-in slide-in-from-top-2 duration-200
+                        border border-gray-300
             ${notification.type === 'error'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-green-100 text-green-800'
+                            ? 'bg-white text-gray-900'
+                            : 'bg-white text-gray-900'
                     }
           `}
                 >

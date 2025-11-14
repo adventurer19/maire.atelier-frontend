@@ -83,7 +83,28 @@ export const productsApi = {
      * Fetch all products with pagination & filters
      */
     getProducts: async (params?: ProductsParams): Promise<ProductsResponse> => {
-        const cacheKey = JSON.stringify(params || {});
+        // Normalize params for cache key - ensure consistent ordering
+        const normalizedParams = params ? {
+            page: params.page,
+            per_page: params.per_page,
+            sort: params.sort,
+            category_id: params.category_id,
+            category: params.category, // category slug
+            search: params.search,
+            price_min: params.price_min,
+            price_max: params.price_max,
+            in_stock: params.in_stock,
+            on_sale: params.on_sale,
+        } : {};
+        
+        // Remove undefined values for consistent cache keys
+        Object.keys(normalizedParams).forEach(key => {
+            if (normalizedParams[key as keyof typeof normalizedParams] === undefined) {
+                delete normalizedParams[key as keyof typeof normalizedParams];
+            }
+        });
+        
+        const cacheKey = JSON.stringify(normalizedParams);
         const cached = getCached(cacheKey) ?? getPersistent(cacheKey);
         if (cached) return cached;
 
@@ -100,6 +121,7 @@ export const productsApi = {
             if (params?.per_page) queryParams.per_page = params.per_page;
             if (params?.sort) queryParams.sort = params.sort;
             if (params?.category_id) queryParams.category_id = params.category_id;
+            if (params?.category) queryParams.category = params.category; // category slug
             if (params?.search) queryParams.search = params.search;
             if (params?.price_min) queryParams.price_min = params.price_min;
             if (params?.price_max) queryParams.price_max = params.price_max;
@@ -246,7 +268,7 @@ export const productsApi = {
         const cached = getCached(cacheKey) ?? getPersistent(cacheKey);
         if (cached) return cached;
         try {
-            let attempt = 0;
+            let attempt = 0;    
             let res;
             while (true) {
                 try {

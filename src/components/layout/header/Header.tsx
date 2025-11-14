@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition, Suspense } from 'react';
+import { useState, useEffect, useTransition, Suspense, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Logo from '@/components/ui/Logo';
@@ -18,8 +18,8 @@ export default function Header() {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
-    // ✅ Функция за зареждане на потребителя
-    const loadUser = () => {
+    // ✅ Функция за зареждане на потребителя (memoized to prevent recreations)
+    const loadUser = useCallback(() => {
         startTransition(async () => {
             try {
                 const res = await fetch('/api/auth/me', { cache: 'no-store' });
@@ -33,12 +33,12 @@ export default function Header() {
                 setUser(null);
             }
         });
-    };
+    }, []); // Empty deps - function doesn't depend on any props/state
 
     // ✅ Взимаме текущия потребител при mount
     useEffect(() => {
         loadUser();
-    }, []);
+    }, [loadUser]);
 
     // ✅ Слушаме за промени в localStorage (когато се логне потребителят)
     useEffect(() => {
@@ -56,19 +56,20 @@ export default function Header() {
             window.removeEventListener('storage', handleStorageChange);
             window.removeEventListener('auth-state-change', handleStorageChange);
         };
-    }, []);
+    }, [loadUser]);
 
     // ✅ Проверяваме на интервал (fallback за когато потребителят се логне в друг таб)
-    // Но само ако няма user (за да не правиме ненужни заявки)
+    // Но само ако няма user и само веднъж на минута (намалено от 10 секунди)
     useEffect(() => {
         if (user) return; // Не проверяваме ако вече имаме user
         
+        // Increase interval to 60 seconds to reduce API calls
         const interval = setInterval(() => {
             loadUser();
-        }, 10000); // Проверяваме всеки 10 секунди само ако няма user
+        }, 60000); // Проверяваме всеки 60 секунди само ако няма user
 
         return () => clearInterval(interval);
-    }, [user]);
+    }, [user, loadUser]);
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -152,17 +153,73 @@ function AuthDropdown({ user, onUserChange }: { user: any; onUserChange?: () => 
         setOpen(false);
     };
 
-    // Ако потребителят е влязъл, иконката води директно до account
+    // Ако потребителят е влязъл, показваме dropdown с опции
     if (user) {
         return (
-            <Link
-                href="/account"
+            <div className="relative">
+                <button
+                    onClick={() => setOpen((o) => !o)}
                 className="flex items-center justify-center h-10 w-10 rounded-full hover:bg-gray-100 transition-colors relative"
                 aria-label={t('auth.account')}
                 title={t('auth.account')}
             >
                 <UserIcon />
-            </Link>
+                </button>
+
+                {open && (
+                    <div className="absolute right-0 mt-2 bg-white border border-gray-200 shadow-lg w-56 py-2 z-50">
+                        {/* User Info */}
+                        <div className="px-4 py-3 border-b border-gray-100">
+                            <p className="text-sm font-light text-gray-900 truncate">
+                                {typeof user.name === 'string' ? user.name : user.name?.bg || user.name?.en || user.email}
+                            </p>
+                            <p className="text-xs font-light text-gray-600 truncate mt-1">
+                                {user.email}
+                            </p>
+                        </div>
+
+                        {/* Menu Items */}
+                        <Link
+                            href="/account"
+                            onClick={() => setOpen(false)}
+                            className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm font-light hover:bg-gray-50 text-gray-900 transition-colors"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                            </svg>
+                            {t('auth.account')}
+                        </Link>
+                        <Link
+                            href="/account/settings"
+                            onClick={() => setOpen(false)}
+                            className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm font-light hover:bg-gray-50 text-gray-900 transition-colors"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                            {t('auth.edit_profile')}
+                        </Link>
+                        <div className="border-t border-gray-100 my-1"></div>
+                        <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm font-light hover:bg-gray-50 text-gray-900 transition-colors"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                            </svg>
+                            {t('auth.logout')}
+                        </button>
+                    </div>
+                )}
+
+                {/* Click outside to close */}
+                {open && (
+                    <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setOpen(false)}
+                    />
+                )}
+            </div>
         );
     }
 
@@ -178,24 +235,24 @@ function AuthDropdown({ user, onUserChange }: { user: any; onUserChange?: () => 
             </button>
 
             {open && (
-                <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-md w-48 py-1 z-50 animate-in fade-in-0 zoom-in-95">
+                <div className="absolute right-0 mt-2 bg-white border border-gray-200 shadow-lg w-48 py-2 z-50">
                     <Link
                         href="/login"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 text-gray-800"
+                        className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm font-light hover:bg-gray-50 text-gray-900 transition-colors"
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
                         </svg>
                         {t('auth.login')}
                     </Link>
                     <Link
                         href="/register"
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100 text-gray-800"
+                        className="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm font-light hover:bg-gray-50 text-gray-900 transition-colors"
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
                         </svg>
                         {t('auth.register')}
                     </Link>
@@ -236,7 +293,7 @@ function LanguageDropdown() {
             </button>
 
             {open && (
-                <div className="absolute right-0 mt-2 bg-white border rounded-lg shadow-md w-36 py-1 z-50 animate-in fade-in-0 zoom-in-95">
+                <div className="absolute right-0 mt-2 bg-white border border-gray-200 shadow-lg w-44 py-2 z-50">
                     {languages.map((l) => (
                         <button
                             key={l.code}
@@ -244,17 +301,30 @@ function LanguageDropdown() {
                                 setLang(l.code);
                                 setOpen(false);
                             }}
-                            className={`flex items-center gap-2 w-full text-left px-3 py-1.5 text-sm ${
+                            className={`flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm font-light transition-colors ${
                                 l.code === lang
-                                    ? 'bg-gray-900 text-white font-semibold'
-                                    : 'hover:bg-gray-100 text-gray-800'
+                                    ? 'bg-gray-50 text-gray-900 border-l-2 border-gray-400'
+                                    : 'hover:bg-gray-50 text-gray-900'
                             }`}
                         >
-                            <span>{l.flag}</span>
-                            {l.label}
+                            <span className="text-base">{l.flag}</span>
+                            <span className="flex-1">{l.label}</span>
+                            {l.code === lang && (
+                                <svg className="w-4 h-4 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            )}
                         </button>
                     ))}
                 </div>
+            )}
+
+            {/* Click outside to close */}
+            {open && (
+                <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setOpen(false)}
+                />
             )}
         </div>
     );

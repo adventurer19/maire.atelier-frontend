@@ -27,7 +27,9 @@ export function useWishlist() {
         queryKey: wishlistKeys.detail(),
         queryFn: wishlistApi.getWishlist,
         staleTime: 1000 * 60 * 5, // 5 minutes
-        retry: 2,
+        retry: false, // Don't retry - getWishlist handles 401 gracefully by returning empty array
+        // If user is not authenticated, getWishlist returns empty array
+        // This allows the component to work for non-authenticated users
     });
 
     return {

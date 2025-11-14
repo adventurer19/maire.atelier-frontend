@@ -24,6 +24,7 @@ interface ProductsPageProps {
         price_min?: string;
         price_max?: string;
         in_stock?: string;
+        sale?: string;
     }>;
 }
 
@@ -34,6 +35,7 @@ async function getProducts(searchParams: Awaited<ProductsPageProps['searchParams
     const priceMin = searchParams.price_min ? Number(searchParams.price_min) : undefined;
     const priceMax = searchParams.price_max ? Number(searchParams.price_max) : undefined;
     const inStock = searchParams.in_stock === '1';
+    const onSale = searchParams.sale === 'true';
 
     try {
         const params: any = {
@@ -58,6 +60,11 @@ async function getProducts(searchParams: Awaited<ProductsPageProps['searchParams
         // Add stock filter if checked
         if (inStock) {
             params.in_stock = 1;
+        }
+
+        // Add on sale filter if provided
+        if (onSale) {
+            params.on_sale = true;
         }
 
         const { data, meta } = await productsApi.getProducts(params);

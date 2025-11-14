@@ -33,10 +33,10 @@ export default function AccountPage() {
 
     if (!user) {
         return (
-            <div className="container mx-auto px-4 py-16">
+            <div className="min-h-screen bg-gradient-to-br from-white via-[#FCFCFB] to-gray-50 flex items-center justify-center">
                 <div className="text-center">
                     <LoadingSpinner />
-                    <p className="mt-4 text-gray-600">{t('account.loading')}</p>
+                    <p className="mt-4 text-gray-600 font-light">{t('account.loading')}</p>
                 </div>
             </div>
         );
@@ -45,17 +45,18 @@ export default function AccountPage() {
     const userName = typeof user.name === 'string' ? user.name : user.name?.bg || user.name?.en || '';
 
     return (
-        <div className="container mx-auto px-3 md:px-4 lg:px-6 py-4 md:py-6 lg:py-8">
-            {/* Header */}
-            <div className="mb-6 md:mb-8">
-                <h1 className="text-2xl md:text-3xl font-serif font-bold mb-2 leading-tight">
+        <div className="min-h-screen bg-gradient-to-br from-white via-[#FCFCFB] to-gray-50">
+            <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl py-8 md:py-12 lg:py-16">
+                {/* Header - Elegant Typography */}
+                <div className="mb-8 md:mb-12">
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-gray-900 mb-4 tracking-tight">
                     {t('account.welcome', { name: userName })}
                 </h1>
-                <p className="text-sm md:text-base text-gray-600">{t('account.subtitle')}</p>
+                    <p className="text-base md:text-lg text-gray-600 font-light">{t('account.subtitle')}</p>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                {/* Stats Cards - Sharp Design */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 lg:gap-8 mb-12 md:mb-16">
                 <StatCard
                     title={t('account.total_orders')}
                     value={orders?.length || 0}
@@ -76,14 +77,16 @@ export default function AccountPage() {
                 />
             </div>
 
-            {/* Recent Orders */}
-            <div className="mb-6 md:mb-8">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2 md:gap-4">
-                    <h2 className="text-xl md:text-2xl font-bold">{t('account.recent_orders')}</h2>
+                {/* Recent Orders - Sharp Design */}
+                <div className="mb-12 md:mb-16">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 md:mb-8 gap-4">
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 tracking-tight">
+                            {t('account.recent_orders')}
+                        </h2>
                     {orders && orders.length > 0 && (
                         <Link
                             href="/account/orders"
-                            className="text-xs md:text-sm text-gray-600 hover:text-gray-900 active:text-gray-700"
+                                className="text-sm md:text-base text-gray-600 hover:text-gray-900 font-light underline underline-offset-4 transition-colors"
                         >
                             {t('account.view_all')}
                         </Link>
@@ -91,11 +94,11 @@ export default function AccountPage() {
                 </div>
 
                 {ordersLoading ? (
-                    <div className="text-center py-8">
+                        <div className="text-center py-12">
                         <LoadingSpinner />
                     </div>
                 ) : orders && orders.length > 0 ? (
-                    <div className="space-y-4">
+                        <div className="space-y-4 md:space-y-6">
                         {orders.slice(0, 5).map((order) => (
                             <OrderCard key={order.id} order={order} />
                         ))}
@@ -105,24 +108,34 @@ export default function AccountPage() {
                 )}
             </div>
 
-            {/* Account Info */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
-                <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">{t('account.account_info')}</h2>
-                <div className="space-y-2 md:space-y-3">
+                {/* Account Info - Sharp Design */}
+                <div className="bg-white border border-gray-200 shadow-sm p-6 md:p-8 lg:p-10">
+                    <h2 className="text-xl md:text-2xl lg:text-3xl font-light text-gray-900 mb-6 md:mb-8 tracking-tight">
+                        {t('account.account_info')}
+                    </h2>
+                    <div className="space-y-4 md:space-y-5 mb-6 md:mb-8">
                     <InfoRow label={t('account.name')} value={userName} />
                     <InfoRow label={t('account.email')} value={user.email} />
                     <InfoRow
                         label={t('account.member_since')}
-                        value={user.created_at ? new Date(user.created_at).toLocaleDateString(lang === 'bg' ? 'bg-BG' : 'en-US') : '-'}
+                            value={user.created_at ? new Date(user.created_at).toLocaleDateString(lang === 'bg' ? 'bg-BG' : 'en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            }) : '-'}
                     />
                 </div>
-                <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200">
+                    <div className="pt-6 md:pt-8 border-t border-gray-200">
                     <Link
                         href="/account/settings"
-                        className="text-xs md:text-sm text-gray-600 hover:text-gray-900 active:text-gray-700"
+                            className="inline-flex items-center gap-2 text-sm md:text-base text-gray-900 hover:text-gray-700 font-light underline underline-offset-4 transition-colors"
                     >
-                        {t('account.edit_settings')} →
+                            {t('account.edit_settings')}
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
                     </Link>
+                    </div>
                 </div>
             </div>
         </div>
@@ -143,14 +156,14 @@ function StatCard({
     return (
         <Link
             href={href}
-            className="bg-white border border-gray-200 rounded-lg p-4 md:p-6 hover:shadow-md active:shadow-lg transition-shadow touch-manipulation"
+            className="bg-white border border-gray-200 shadow-sm p-6 md:p-8 hover:border-gray-300 hover:shadow-md transition-all duration-300 group"
         >
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="text-xs md:text-sm text-gray-600 mb-1">{title}</p>
-                    <p className="text-2xl md:text-3xl font-bold">{value}</p>
+                    <p className="text-xs md:text-sm text-gray-600 mb-2 font-light">{title}</p>
+                    <p className="text-3xl md:text-4xl lg:text-5xl font-light text-gray-900">{value}</p>
                 </div>
-                <div className="text-gray-400 w-8 h-8 md:w-10 md:h-10">{icon}</div>
+                <div className="text-gray-400 group-hover:text-gray-900 transition-colors w-8 h-8 md:w-10 md:h-10">{icon}</div>
             </div>
         </Link>
     );
@@ -184,35 +197,40 @@ function OrderCard({ order }: { order: any }) {
     return (
         <Link
             href={`/account/orders/${order.id}`}
-            className="block bg-white border border-gray-200 rounded-lg p-4 md:p-6 hover:shadow-md active:shadow-lg transition-shadow touch-manipulation"
+            className="block bg-white border border-gray-200 shadow-sm p-6 md:p-8 hover:border-gray-300 hover:shadow-md transition-all duration-300 group"
         >
-            <div className="flex items-start justify-between gap-3 md:gap-4">
+            <div className="flex items-start justify-between gap-4 md:gap-6">
                 <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
-                        <h3 className="font-semibold text-sm md:text-base">
+                    <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-3">
+                        <h3 className="text-base md:text-lg font-light text-gray-900">
                             {t('orders.order')} #{order.id}
                         </h3>
                         <span
-                            className={`px-2 py-1 rounded text-[10px] md:text-xs font-medium whitespace-nowrap ${
-                                statusColors[order.status] || statusColors.pending
+                            className={`px-3 py-1.5 text-xs md:text-sm font-normal whitespace-nowrap border ${
+                                order.status === 'delivered' ? 'border-green-300 bg-green-50 text-green-900' :
+                                order.status === 'shipped' ? 'border-blue-300 bg-blue-50 text-blue-900' :
+                                order.status === 'processing' ? 'border-blue-300 bg-blue-50 text-blue-900' :
+                                order.status === 'pending' ? 'border-yellow-300 bg-yellow-50 text-yellow-900' :
+                                order.status === 'cancelled' ? 'border-red-300 bg-red-50 text-red-900' :
+                                'border-gray-300 bg-gray-50 text-gray-900'
                             }`}
                         >
                             {statusLabels[order.status] || order.status}
                         </span>
                     </div>
-                    <p className="text-xs md:text-sm text-gray-600 mb-2">{orderDate}</p>
-                    <div className="flex flex-wrap items-center gap-3 md:gap-4 text-xs md:text-sm text-gray-600">
+                    <p className="text-sm md:text-base text-gray-600 mb-3 font-light">{orderDate}</p>
+                    <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm md:text-base text-gray-600 font-light">
                         <span>
                             {order.items?.length || 0}{' '}
                             {order.items?.length === 1 ? t('orders.item') : t('orders.items')}
                         </span>
-                        <span className="font-semibold text-gray-900">
-                            {Number(order.total || 0).toFixed(2)} лв
+                        <span className="font-light text-gray-900">
+                            {Number(order.total || 0).toFixed(2)} {t('product.currency')}
                         </span>
                     </div>
                 </div>
-                <div className="text-gray-400 flex-shrink-0">
-                    <ChevronRightIcon className="w-5 h-5" />
+                <div className="text-gray-400 group-hover:text-gray-900 transition-colors flex-shrink-0">
+                    <ChevronRightIcon className="w-5 h-5 md:w-6 md:h-6" />
                 </div>
             </div>
         </Link>
@@ -222,15 +240,15 @@ function OrderCard({ order }: { order: any }) {
 function EmptyOrders() {
     const { t } = useLanguage();
     return (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 md:p-12 text-center">
-            <OrderIcon className="w-12 h-12 md:w-16 md:h-16 mx-auto text-gray-300 mb-3 md:mb-4" />
-            <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2">
+        <div className="bg-white border border-gray-200 shadow-sm p-12 md:p-16 lg:p-20 text-center">
+            <OrderIcon className="w-16 h-16 md:w-20 md:h-20 mx-auto text-gray-300 mb-6 md:mb-8" strokeWidth="1.5" />
+            <h3 className="text-xl md:text-2xl lg:text-3xl font-light text-gray-900 mb-3 md:mb-4 tracking-tight">
                 {t('account.no_orders')}
             </h3>
-            <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6">{t('account.no_orders_desc')}</p>
+            <p className="text-base md:text-lg text-gray-600 mb-8 md:mb-10 font-light">{t('account.no_orders_desc')}</p>
             <Link
                 href="/products"
-                className="inline-block px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 active:bg-gray-700 transition-colors text-sm md:text-base min-h-[48px] flex items-center justify-center touch-manipulation"
+                className="inline-block px-6 py-4 bg-gray-900 text-white font-light hover:bg-gray-800 active:bg-gray-700 transition-all duration-300 text-sm md:text-base min-h-[52px] flex items-center justify-center border-2 border-gray-900"
             >
                 {t('account.start_shopping')}
             </Link>
@@ -240,9 +258,9 @@ function EmptyOrders() {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
     return (
-        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
-            <span className="text-xs md:text-sm text-gray-600">{label}</span>
-            <span className="text-xs md:text-sm font-medium break-all sm:break-normal">{value}</span>
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-4 py-2 border-b border-gray-100 last:border-b-0">
+            <span className="text-sm md:text-base text-gray-600 font-light">{label}</span>
+            <span className="text-sm md:text-base font-light text-gray-900 break-all sm:break-normal">{value}</span>
         </div>
     );
 }

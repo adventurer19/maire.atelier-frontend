@@ -2,10 +2,12 @@
 'use client';
 
 import { useCart, useUpdateCartItem, useRemoveCartItem, useClearCart } from '@/hooks/useCart';
+import { useLanguage } from '@/context/LanguageContext';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function CartPage() {
+    const { t } = useLanguage();
     const { cart, isLoading, isError, error } = useCart();
     const updateCartItem = useUpdateCartItem();
     const removeCartItem = useRemoveCartItem();
@@ -17,7 +19,7 @@ export default function CartPage() {
             <div className="container mx-auto px-4 py-16">
                 <div className="text-center">
                     <LoadingSpinner />
-                    <p className="mt-4 text-gray-600">Loading your cart...</p>
+                    <p className="mt-4 text-gray-600">{t('cart.loading')}</p>
                 </div>
             </div>
         );
@@ -29,14 +31,14 @@ export default function CartPage() {
             <div className="container mx-auto px-4 py-16">
                 <div className="max-w-md mx-auto text-center">
                     <div className="text-red-600 mb-4">
-                        <p className="text-xl font-bold">Error loading cart</p>
-                        <p className="text-sm mt-2">{error?.message || 'Something went wrong'}</p>
+                        <p className="text-xl font-bold">{t('cart.error_loading')}</p>
+                        <p className="text-sm mt-2">{error?.message || t('cart.error_message')}</p>
                     </div>
                     <Link
                         href="/products"
                         className="inline-block px-8 py-3 bg-gray-900 text-white font-medium rounded-md hover:bg-gray-800 transition-colors"
                     >
-                        Continue Shopping
+                        {t('cart.continue_shopping')}
                     </Link>
                 </div>
             </div>
@@ -51,15 +53,15 @@ export default function CartPage() {
                     <div className="mb-6">
                         <ShoppingBagIcon className="w-24 h-24 mx-auto text-gray-300" />
                     </div>
-                    <h1 className="text-2xl font-bold mb-2">Your cart is empty</h1>
+                    <h1 className="text-2xl font-bold mb-2">{t('cart.empty_title')}</h1>
                     <p className="text-gray-600 mb-8">
-                        Start shopping to add items to your cart
+                        {t('cart.empty_desc')}
                     </p>
                     <Link
                         href="/products"
                         className="inline-block px-8 py-3 bg-gray-900 text-white font-medium rounded-md hover:bg-gray-800 transition-colors"
                     >
-                        Continue Shopping
+                        {t('cart.continue_shopping')}
                     </Link>
                 </div>
             </div>
@@ -79,7 +81,7 @@ export default function CartPage() {
 
     // Handle clear cart
     const handleClearCart = () => {
-        if (confirm('Are you sure you want to clear your cart?')) {
+        if (confirm(t('cart.confirm_clear'))) {
             clearCart.mutate();
         }
     };
@@ -87,13 +89,13 @@ export default function CartPage() {
     return (
         <div className="container mx-auto px-3 md:px-4 lg:px-6 py-4 md:py-6 lg:py-8">
             <div className="mb-4 md:mb-6 lg:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4">
-                <h1 className="text-2xl md:text-3xl font-bold">Shopping Cart</h1>
+                <h1 className="text-2xl md:text-3xl font-bold">{t('cart.shopping_cart')}</h1>
                 <button
                     onClick={handleClearCart}
                     disabled={clearCart.isPending}
                     className="text-xs md:text-sm text-red-600 hover:text-red-700 active:text-red-800 font-medium disabled:opacity-50 touch-manipulation py-2 px-3"
                 >
-                    {clearCart.isPending ? 'Clearing...' : 'Clear Cart'}
+                    {clearCart.isPending ? t('cart.clearing') : t('cart.clear_cart')}
                 </button>
             </div>
 
@@ -116,8 +118,8 @@ export default function CartPage() {
                                             className="object-cover"
                                         />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                            No image
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                                            {t('cart.no_image')}
                                         </div>
                                     )}
                                 </div>
@@ -143,12 +145,12 @@ export default function CartPage() {
                                 )}
 
                                 <p className="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">
-                                    SKU: {item.variant?.sku || item.product.sku}
+                                    {t('cart.sku')}: {item.variant?.sku || item.product.sku}
                                 </p>
 
                                 {!item.has_enough_stock && (
                                     <p className="text-xs md:text-sm text-red-600 mt-2 font-medium">
-                                        ⚠️ Only {item.variant?.stock || item.product.stock} left in stock
+                                        ⚠️ {t('cart.only_left', { count: item.variant?.stock || item.product.stock })}
                                     </p>
                                 )}
                             </div>
@@ -159,7 +161,7 @@ export default function CartPage() {
                                     onClick={() => handleRemoveItem(item.id)}
                                     disabled={removeCartItem.isPending}
                                     className="text-gray-400 hover:text-red-600 active:text-red-700 transition-colors disabled:opacity-50 touch-manipulation p-1"
-                                    aria-label="Remove item"
+                                    aria-label={t('cart.remove_item')}
                                 >
                                     <XIcon className="w-5 h-5" />
                                 </button>
@@ -169,7 +171,7 @@ export default function CartPage() {
                                         onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                                         disabled={updateCartItem.isPending || item.quantity <= 1}
                                         className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center border-2 border-gray-300 rounded hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
-                                        aria-label="Decrease quantity"
+                                        aria-label={t('cart.decrease_quantity')}
                                     >
                                         <span className="text-lg">−</span>
                                     </button>
@@ -178,15 +180,19 @@ export default function CartPage() {
                                         onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                                         disabled={updateCartItem.isPending}
                                         className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center border-2 border-gray-300 rounded hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
-                                        aria-label="Increase quantity"
+                                        aria-label={t('cart.increase_quantity')}
                                     >
                                         <span className="text-lg">+</span>
                                     </button>
                                 </div>
 
                                 <div className="text-right">
-                                    <p className="text-xs md:text-sm text-gray-600 hidden md:block">€{item.price.toFixed(2)} each</p>
-                                    <p className="text-base md:text-lg font-bold">€{item.subtotal.toFixed(2)}</p>
+                                    <p className="text-xs md:text-sm text-gray-600 hidden md:block">
+                                        {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? '' : '€'}{item.price.toFixed(2)} {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? t('product.currency') : t('cart.each')}
+                                    </p>
+                                    <p className="text-base md:text-lg font-bold">
+                                        {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? '' : '€'}{item.subtotal.toFixed(2)} {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? t('product.currency') : ''}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -196,31 +202,41 @@ export default function CartPage() {
                 {/* Order Summary */}
                 <div className="lg:col-span-1">
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-6 lg:sticky lg:top-20">
-                        <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">Order Summary</h2>
+                        <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4">{t('cart.order_summary')}</h2>
 
                         <div className="space-y-2 md:space-y-3 mb-4">
                             <div className="flex justify-between text-gray-600 text-sm md:text-base">
-                                <span>Subtotal ({cart.summary.total_items} items)</span>
-                                <span>€{cart.summary.subtotal.toFixed(2)}</span>
+                                <span>
+                                    {t('cart.subtotal')} ({cart.summary.total_items} {cart.summary.total_items === 1 ? t('cart.item') : t('cart.items')})
+                                </span>
+                                <span>
+                                    {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? '' : '€'}{cart.summary.subtotal.toFixed(2)} {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? t('product.currency') : ''}
+                                </span>
                             </div>
 
                             <div className="flex justify-between text-gray-600 text-sm md:text-base">
-                                <span>Shipping</span>
+                                <span>{t('cart.shipping')}</span>
                                 <span>
-                  {cart.summary.shipping === 0 ? 'FREE' : `€${cart.summary.shipping.toFixed(2)}`}
-                </span>
+                                    {cart.summary.shipping === 0 
+                                        ? t('cart.free') 
+                                        : `${t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? '' : '€'}${cart.summary.shipping.toFixed(2)} ${t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? t('product.currency') : ''}`}
+                                </span>
                             </div>
 
                             {cart.summary.tax > 0 && (
                                 <div className="flex justify-between text-gray-600 text-sm md:text-base">
-                                    <span>Tax</span>
-                                    <span>€{cart.summary.tax.toFixed(2)}</span>
+                                    <span>{t('cart.tax')}</span>
+                                    <span>
+                                        {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? '' : '€'}{cart.summary.tax.toFixed(2)} {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? t('product.currency') : ''}
+                                    </span>
                                 </div>
                             )}
 
                             <div className="border-t pt-2 md:pt-3 flex justify-between font-bold text-base md:text-lg">
-                                <span>Total</span>
-                                <span>€{cart.summary.total.toFixed(2)}</span>
+                                <span>{t('cart.total')}</span>
+                                <span>
+                                    {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? '' : '€'}{cart.summary.total.toFixed(2)} {t('product.currency') === 'лв' || t('product.currency') === 'BGN' ? t('product.currency') : ''}
+                                </span>
                             </div>
                         </div>
 
@@ -228,14 +244,14 @@ export default function CartPage() {
                             href="/checkout"
                             className="block w-full py-3 md:py-3.5 bg-gray-900 text-white text-center font-medium rounded-md hover:bg-gray-800 active:bg-gray-700 transition-colors text-sm md:text-base min-h-[48px] flex items-center justify-center touch-manipulation"
                         >
-                            Proceed to Checkout
+                            {t('cart.proceed_to_checkout')}
                         </Link>
 
                         <Link
                             href="/products"
                             className="block w-full mt-3 py-3 md:py-3.5 border-2 border-gray-300 text-gray-700 text-center font-medium rounded-md hover:bg-gray-50 active:bg-gray-100 transition-colors text-sm md:text-base min-h-[48px] flex items-center justify-center touch-manipulation"
                         >
-                            Continue Shopping
+                            {t('cart.continue_shopping')}
                         </Link>
                     </div>
                 </div>
